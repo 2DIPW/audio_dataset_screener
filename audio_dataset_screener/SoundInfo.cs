@@ -23,25 +23,32 @@ namespace audio_dataset_screener
             getSoundInfo(filePath);
         }
 
+        public Shell32.Folder GetShell32NameSpaceFolder(Object folder) 
+        {
+            Type shellAppType = Type.GetTypeFromProgID("Shell.Application");
+
+            Object shell = Activator.CreateInstance(shellAppType);
+            return (Shell32.Folder)shellAppType.InvokeMember("NameSpace",
+          System.Reflection.BindingFlags.InvokeMethod, null, shell, new object[] { folder });
+        }
+
         private void getSoundInfo(string path)
         {
+            filePath = path;
             try
             {
-                ShellClass sh = new ShellClass();
-                Folder dir = sh.NameSpace(Path.GetDirectoryName(path));
+                //Shell sh = new Shell();
+                Folder dir = GetShell32NameSpaceFolder(Path.GetDirectoryName(path));
                 FolderItem item = dir.ParseName(Path.GetFileName(path));
 
                 fileName = dir.GetDetailsOf(item, 0);
-
-                filePath = path;
-
                 duration = dir.GetDetailsOf(item, 27);
-
 
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
+                duration = string.Empty;
             }
         }
     }
