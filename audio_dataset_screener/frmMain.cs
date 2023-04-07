@@ -32,6 +32,7 @@ namespace audio_dataset_screener
             wmp.settings.volume = 100;
             wmp.enableContextMenu = false;
             wmp.settings.autoStart = false;
+            comboPlaySpeed.SelectedIndex = 2;
         }
 
         #region 共用方法
@@ -41,7 +42,7 @@ namespace audio_dataset_screener
             {
                 current_playing = 0; //若列表已空，则不进行播放标记的添加，并将当前播放项重置为0
                 grpPlaycontrol.Enabled = false;
-                grpAction.Enabled = false;//禁用操作面板防止用户输入
+                grpAction.Enabled = false;
             }
             else
             {
@@ -67,8 +68,19 @@ namespace audio_dataset_screener
             timerPlay.Stop();//进度条停止走动
             tckbarPlayprogress.Value = 0;
         }
+        private void apply_playspeed()
+        {
+            if (wmp.settings.isAvailable["Rate"])//受到wmp限制，部分格式不支持倍速播放
+            {
+                wmp.settings.rate = Double.Parse(comboPlaySpeed.Text);
+            }
+        }
         private void wmp_play()
         {
+            if (comboPlaySpeed.SelectedIndex != 2)//wmp的播放速度不是全局设置，经常会被重置。当速度不是1x，只要开始播放就重新设置倍速。
+            {
+                apply_playspeed();
+            }
             wmp.Ctlcontrols.play();
             timerPlay.Start();//进度条开始走动
 ;        }
@@ -320,7 +332,7 @@ namespace audio_dataset_screener
         {
             if (lvFileList.SelectedItems.Count > 0) //用户双击列表空白处时会取消选中，不响应此操作
             {
-                set_current_playing(lvFileList.Items.IndexOf(lvFileList.SelectedItems[0]));
+                set_current_playing(lvFileList.SelectedItems[0].Index);
                 wmp_play();
             }
             
@@ -350,13 +362,13 @@ namespace audio_dataset_screener
         #region 播放控制逻辑
         private void btnPlayPause_Click(object sender, EventArgs e) //播放暂停键
         {
-            if(wmp.playState.ToString()== "wmppsPlaying")
+            if(wmp.playState.ToString()== "wmppsPlaying" | wmp.playState.ToString() == "wmppsScanForward")//有时wmp会自作聪明地把正在倍速播放的文件设为wmppsScanForward状态，麻了
             {
-                wmp_pause();
+                    wmp_pause();
             }
             else
             {
-                wmp_play();
+                    wmp_play();
             }
         }
 
@@ -401,7 +413,10 @@ namespace audio_dataset_screener
         {
             wmp.settings.volume = tckbarVolume.Value;
         }
-
+        private void comboPlaySpeed_SelectedIndexChanged(object sender, EventArgs e)//倍速选择
+        {
+            apply_playspeed();
+        }
         private void wmp_PlayStateChange(object sender, AxWMPLib._WMPOCXEvents_PlayStateChangeEvent e) //播放完毕事件
         {
             if (wmp.playState.ToString() == "wmppsMediaEnded")
@@ -420,9 +435,12 @@ namespace audio_dataset_screener
 
         private void timerPlay_Tick(object sender, EventArgs e) //实时播放进度条
         {
-            tckbarPlayprogress.Maximum = (int)wmp.currentMedia.duration;
-            tckbarPlayprogress.Value = (int)wmp.Ctlcontrols.currentPosition;
-
+            try
+            {
+                tckbarPlayprogress.Maximum = (int)wmp.currentMedia.duration;
+                tckbarPlayprogress.Value = (int)wmp.Ctlcontrols.currentPosition;
+            }
+            catch { }
         }
         private void tckbarPlayprogress_MouseDown(object sender, MouseEventArgs e)
         {
@@ -567,7 +585,7 @@ namespace audio_dataset_screener
             }
             else
             {
-                MessageBox.Show($"已成功处理{succeed_amount.ToString()}个文件！", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show($"已成功应用所有动作！", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             set_current_playing(0);
         }
@@ -640,7 +658,7 @@ namespace audio_dataset_screener
             {
                 if(item.SubItems[1].Text != string.Empty)
                 {
-                    if (MessageBox.Show("还有未应用的筛选动作，确实要退出程序吗？", "筛选动作未应用", MessageBoxButtons.OKCancel) == DialogResult.Cancel)
+                    if (MessageBox.Show("还有未应用的筛选动作，确实要退出程序吗？", "筛选动作未应用", MessageBoxButtons.OKCancel) != DialogResult.OK)
                     {
                         e.Cancel = true;//取消关闭动作
                         return;

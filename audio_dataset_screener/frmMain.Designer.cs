@@ -61,6 +61,7 @@
             this.labelSortFolder3 = new System.Windows.Forms.Label();
             this.labelSortFolder2 = new System.Windows.Forms.Label();
             this.labelSortFolder1 = new System.Windows.Forms.Label();
+            this.labelPlaySpeed = new System.Windows.Forms.Label();
             this.labelStep = new System.Windows.Forms.Label();
             this.grpPlaycontrol = new System.Windows.Forms.GroupBox();
             this.labelVolume = new System.Windows.Forms.Label();
@@ -72,6 +73,7 @@
             this.btnPlayPause = new System.Windows.Forms.Button();
             this.btnNext = new System.Windows.Forms.Button();
             this.btnPrevious = new System.Windows.Forms.Button();
+            this.wmp = new AxWMPLib.AxWindowsMediaPlayer();
             this.btnDelete = new System.Windows.Forms.Button();
             this.btnToFolder5 = new System.Windows.Forms.Button();
             this.btnToFolder4 = new System.Windows.Forms.Button();
@@ -88,15 +90,15 @@
             this.btnCancelAllActions = new System.Windows.Forms.Button();
             this.btnApplySelectedActions = new System.Windows.Forms.Button();
             this.btnCancelSelectedActions = new System.Windows.Forms.Button();
-            this.wmp = new AxWMPLib.AxWindowsMediaPlayer();
+            this.comboPlaySpeed = new System.Windows.Forms.ComboBox();
             this.grpFileList.SuspendLayout();
             this.grpConfig.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericStep)).BeginInit();
             this.grpPlaycontrol.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tckbarVolume)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tckbarPlayprogress)).BeginInit();
-            this.grpAction.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.wmp)).BeginInit();
+            this.grpAction.SuspendLayout();
             this.SuspendLayout();
             // 
             // grpFileList
@@ -112,7 +114,7 @@
             this.grpFileList.Controls.Add(this.lvFileList);
             this.grpFileList.Location = new System.Drawing.Point(12, 12);
             this.grpFileList.Name = "grpFileList";
-            this.grpFileList.Size = new System.Drawing.Size(582, 610);
+            this.grpFileList.Size = new System.Drawing.Size(582, 636);
             this.grpFileList.TabIndex = 0;
             this.grpFileList.TabStop = false;
             this.grpFileList.Text = "文件列表";
@@ -120,7 +122,7 @@
             // btnClearList
             // 
             this.btnClearList.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnClearList.Location = new System.Drawing.Point(330, 579);
+            this.btnClearList.Location = new System.Drawing.Point(330, 605);
             this.btnClearList.Name = "btnClearList";
             this.btnClearList.Size = new System.Drawing.Size(75, 23);
             this.btnClearList.TabIndex = 1;
@@ -133,7 +135,7 @@
             // 
             this.btnDeleteSelected.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnDeleteSelected.ForeColor = System.Drawing.Color.Red;
-            this.btnDeleteSelected.Location = new System.Drawing.Point(249, 579);
+            this.btnDeleteSelected.Location = new System.Drawing.Point(249, 605);
             this.btnDeleteSelected.Name = "btnDeleteSelected";
             this.btnDeleteSelected.Size = new System.Drawing.Size(75, 23);
             this.btnDeleteSelected.TabIndex = 1;
@@ -145,7 +147,7 @@
             // btnRemoveSelected
             // 
             this.btnRemoveSelected.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnRemoveSelected.Location = new System.Drawing.Point(168, 579);
+            this.btnRemoveSelected.Location = new System.Drawing.Point(168, 605);
             this.btnRemoveSelected.Name = "btnRemoveSelected";
             this.btnRemoveSelected.Size = new System.Drawing.Size(75, 23);
             this.btnRemoveSelected.TabIndex = 1;
@@ -157,7 +159,7 @@
             // btnAddFolder
             // 
             this.btnAddFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnAddFolder.Location = new System.Drawing.Point(87, 579);
+            this.btnAddFolder.Location = new System.Drawing.Point(87, 605);
             this.btnAddFolder.Name = "btnAddFolder";
             this.btnAddFolder.Size = new System.Drawing.Size(75, 23);
             this.btnAddFolder.TabIndex = 1;
@@ -169,7 +171,7 @@
             // btnAddFile
             // 
             this.btnAddFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnAddFile.Location = new System.Drawing.Point(6, 579);
+            this.btnAddFile.Location = new System.Drawing.Point(6, 605);
             this.btnAddFile.Name = "btnAddFile";
             this.btnAddFile.Size = new System.Drawing.Size(75, 23);
             this.btnAddFile.TabIndex = 0;
@@ -196,7 +198,7 @@
             this.lvFileList.HideSelection = false;
             this.lvFileList.Location = new System.Drawing.Point(6, 18);
             this.lvFileList.Name = "lvFileList";
-            this.lvFileList.Size = new System.Drawing.Size(570, 555);
+            this.lvFileList.Size = new System.Drawing.Size(570, 581);
             this.lvFileList.TabIndex = 0;
             this.lvFileList.TabStop = false;
             this.lvFileList.UseCompatibleStateImageBehavior = false;
@@ -241,6 +243,7 @@
             // grpConfig
             // 
             this.grpConfig.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.grpConfig.Controls.Add(this.comboPlaySpeed);
             this.grpConfig.Controls.Add(this.btnSortFolder5);
             this.grpConfig.Controls.Add(this.chkListAuto);
             this.grpConfig.Controls.Add(this.btnSortFolder4);
@@ -258,10 +261,11 @@
             this.grpConfig.Controls.Add(this.labelSortFolder3);
             this.grpConfig.Controls.Add(this.labelSortFolder2);
             this.grpConfig.Controls.Add(this.labelSortFolder1);
+            this.grpConfig.Controls.Add(this.labelPlaySpeed);
             this.grpConfig.Controls.Add(this.labelStep);
             this.grpConfig.Location = new System.Drawing.Point(608, 12);
             this.grpConfig.Name = "grpConfig";
-            this.grpConfig.Size = new System.Drawing.Size(315, 209);
+            this.grpConfig.Size = new System.Drawing.Size(315, 236);
             this.grpConfig.TabIndex = 1;
             this.grpConfig.TabStop = false;
             this.grpConfig.Text = "设置";
@@ -281,7 +285,7 @@
             // 
             this.chkListAuto.Checked = true;
             this.chkListAuto.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkListAuto.Location = new System.Drawing.Point(175, 173);
+            this.chkListAuto.Location = new System.Drawing.Point(173, 173);
             this.chkListAuto.Name = "chkListAuto";
             this.chkListAuto.Size = new System.Drawing.Size(107, 23);
             this.chkListAuto.TabIndex = 6;
@@ -433,6 +437,15 @@
             this.labelSortFolder1.TabIndex = 0;
             this.labelSortFolder1.Text = "分类目录1";
             // 
+            // labelPlaySpeed
+            // 
+            this.labelPlaySpeed.AutoSize = true;
+            this.labelPlaySpeed.Location = new System.Drawing.Point(19, 206);
+            this.labelPlaySpeed.Name = "labelPlaySpeed";
+            this.labelPlaySpeed.Size = new System.Drawing.Size(287, 12);
+            this.labelPlaySpeed.TabIndex = 9;
+            this.labelPlaySpeed.Text = "播放速度            倍   部分格式不支持倍速播放";
+            // 
             // labelStep
             // 
             this.labelStep.AutoSize = true;
@@ -457,7 +470,7 @@
             this.grpPlaycontrol.Controls.Add(this.btnPrevious);
             this.grpPlaycontrol.Controls.Add(this.wmp);
             this.grpPlaycontrol.Enabled = false;
-            this.grpPlaycontrol.Location = new System.Drawing.Point(608, 227);
+            this.grpPlaycontrol.Location = new System.Drawing.Point(608, 254);
             this.grpPlaycontrol.Name = "grpPlaycontrol";
             this.grpPlaycontrol.Size = new System.Drawing.Size(315, 223);
             this.grpPlaycontrol.TabIndex = 2;
@@ -564,6 +577,16 @@
             this.btnPrevious.UseVisualStyleBackColor = true;
             this.btnPrevious.Click += new System.EventHandler(this.btnPrevious_Click);
             // 
+            // wmp
+            // 
+            this.wmp.Enabled = true;
+            this.wmp.Location = new System.Drawing.Point(12, 20);
+            this.wmp.Name = "wmp";
+            this.wmp.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("wmp.OcxState")));
+            this.wmp.Size = new System.Drawing.Size(290, 40);
+            this.wmp.TabIndex = 0;
+            this.wmp.PlayStateChange += new AxWMPLib._WMPOCXEvents_PlayStateChangeEventHandler(this.wmp_PlayStateChange);
+            // 
             // btnDelete
             // 
             this.btnDelete.Location = new System.Drawing.Point(260, 20);
@@ -646,11 +669,11 @@
             this.labelAbout.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.labelAbout.AutoSize = true;
             this.labelAbout.Font = new System.Drawing.Font("Times New Roman", 10.5F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelAbout.Location = new System.Drawing.Point(645, 606);
+            this.labelAbout.Location = new System.Drawing.Point(645, 632);
             this.labelAbout.Name = "labelAbout";
             this.labelAbout.Size = new System.Drawing.Size(240, 17);
             this.labelAbout.TabIndex = 4;
-            this.labelAbout.Text = "Audio Dataset Screener 1.0.0 by 2DIPW";
+            this.labelAbout.Text = "Audio Dataset Screener 1.1.0 by 2DIPW";
             // 
             // labelShortcut2
             // 
@@ -676,7 +699,7 @@
             this.grpAction.Controls.Add(this.btnToFolder5);
             this.grpAction.Controls.Add(this.btnDelete);
             this.grpAction.Enabled = false;
-            this.grpAction.Location = new System.Drawing.Point(608, 456);
+            this.grpAction.Location = new System.Drawing.Point(608, 483);
             this.grpAction.Name = "grpAction";
             this.grpAction.Size = new System.Drawing.Size(315, 146);
             this.grpAction.TabIndex = 6;
@@ -724,21 +747,29 @@
             this.btnCancelSelectedActions.UseVisualStyleBackColor = true;
             this.btnCancelSelectedActions.Click += new System.EventHandler(this.btnCancelSelectedActions_Click);
             // 
-            // wmp
+            // comboPlaySpeed
             // 
-            this.wmp.Enabled = true;
-            this.wmp.Location = new System.Drawing.Point(12, 20);
-            this.wmp.Name = "wmp";
-            this.wmp.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("wmp.OcxState")));
-            this.wmp.Size = new System.Drawing.Size(290, 40);
-            this.wmp.TabIndex = 0;
-            this.wmp.PlayStateChange += new AxWMPLib._WMPOCXEvents_PlayStateChangeEventHandler(this.wmp_PlayStateChange);
+            this.comboPlaySpeed.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboPlaySpeed.FormattingEnabled = true;
+            this.comboPlaySpeed.Items.AddRange(new object[] {
+            "0.50",
+            "0.75",
+            "1.00",
+            "1.25",
+            "1.50",
+            "2.00",
+            "2.50"});
+            this.comboPlaySpeed.Location = new System.Drawing.Point(83, 202);
+            this.comboPlaySpeed.Name = "comboPlaySpeed";
+            this.comboPlaySpeed.Size = new System.Drawing.Size(50, 20);
+            this.comboPlaySpeed.TabIndex = 11;
+            this.comboPlaySpeed.SelectedIndexChanged += new System.EventHandler(this.comboPlaySpeed_SelectedIndexChanged);
             // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(931, 634);
+            this.ClientSize = new System.Drawing.Size(931, 660);
             this.Controls.Add(this.grpAction);
             this.Controls.Add(this.labelAbout);
             this.Controls.Add(this.grpPlaycontrol);
@@ -761,9 +792,9 @@
             this.grpPlaycontrol.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tckbarVolume)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.tckbarPlayprogress)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.wmp)).EndInit();
             this.grpAction.ResumeLayout(false);
             this.grpAction.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.wmp)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -830,6 +861,8 @@
         private System.Windows.Forms.Button btnCancelSelectedActions;
         private System.Windows.Forms.Button btnCancelAllActions;
         private System.Windows.Forms.Button btnApplySelectedActions;
+        private System.Windows.Forms.Label labelPlaySpeed;
+        private System.Windows.Forms.ComboBox comboPlaySpeed;
     }
 }
 
