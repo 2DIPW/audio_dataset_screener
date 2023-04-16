@@ -72,6 +72,7 @@
       <DependentUpon>frmMain.cs</DependentUpon>
     </Compile>
     <Compile Include="ListViewItemComparer.cs" />
+    <Compile Include="PlaybackProgress.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SoundInfo.cs" />

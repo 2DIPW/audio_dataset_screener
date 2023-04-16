@@ -31,6 +31,7 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             this.grpFileList = new System.Windows.Forms.GroupBox();
+            this.processBar = new System.Windows.Forms.ProgressBar();
             this.btnClearList = new System.Windows.Forms.Button();
             this.btnDeleteSelected = new System.Windows.Forms.Button();
             this.btnRemoveSelected = new System.Windows.Forms.Button();
@@ -44,6 +45,8 @@
             this.chPath = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.labelFileCounter = new System.Windows.Forms.Label();
             this.grpConfig = new System.Windows.Forms.GroupBox();
+            this.numericSleepTimeForAutoPlay = new System.Windows.Forms.NumericUpDown();
+            this.comboPlaySpeed = new System.Windows.Forms.ComboBox();
             this.btnSortFolder5 = new System.Windows.Forms.Button();
             this.chkListAuto = new System.Windows.Forms.CheckBox();
             this.btnSortFolder4 = new System.Windows.Forms.Button();
@@ -61,6 +64,7 @@
             this.labelSortFolder3 = new System.Windows.Forms.Label();
             this.labelSortFolder2 = new System.Windows.Forms.Label();
             this.labelSortFolder1 = new System.Windows.Forms.Label();
+            this.labelSleepTimeForAutoPlay = new System.Windows.Forms.Label();
             this.labelPlaySpeed = new System.Windows.Forms.Label();
             this.labelStep = new System.Windows.Forms.Label();
             this.grpPlaycontrol = new System.Windows.Forms.GroupBox();
@@ -90,9 +94,12 @@
             this.btnCancelAllActions = new System.Windows.Forms.Button();
             this.btnApplySelectedActions = new System.Windows.Forms.Button();
             this.btnCancelSelectedActions = new System.Windows.Forms.Button();
-            this.comboPlaySpeed = new System.Windows.Forms.ComboBox();
+            this.timerSleep = new System.Windows.Forms.Timer(this.components);
+            this.tip = new System.Windows.Forms.ToolTip(this.components);
+            this.labelPlayprogressString = new System.Windows.Forms.Label();
             this.grpFileList.SuspendLayout();
             this.grpConfig.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericSleepTimeForAutoPlay)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericStep)).BeginInit();
             this.grpPlaycontrol.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tckbarVolume)).BeginInit();
@@ -106,6 +113,7 @@
             this.grpFileList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.grpFileList.Controls.Add(this.processBar);
             this.grpFileList.Controls.Add(this.btnClearList);
             this.grpFileList.Controls.Add(this.btnDeleteSelected);
             this.grpFileList.Controls.Add(this.btnRemoveSelected);
@@ -114,15 +122,25 @@
             this.grpFileList.Controls.Add(this.lvFileList);
             this.grpFileList.Location = new System.Drawing.Point(12, 12);
             this.grpFileList.Name = "grpFileList";
-            this.grpFileList.Size = new System.Drawing.Size(582, 636);
+            this.grpFileList.Size = new System.Drawing.Size(582, 637);
             this.grpFileList.TabIndex = 0;
             this.grpFileList.TabStop = false;
             this.grpFileList.Text = "文件列表";
             // 
+            // processBar
+            // 
+            this.processBar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.processBar.Location = new System.Drawing.Point(411, 608);
+            this.processBar.Name = "processBar";
+            this.processBar.Size = new System.Drawing.Size(165, 18);
+            this.processBar.Step = 1;
+            this.processBar.TabIndex = 0;
+            this.processBar.Visible = false;
+            // 
             // btnClearList
             // 
             this.btnClearList.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnClearList.Location = new System.Drawing.Point(330, 605);
+            this.btnClearList.Location = new System.Drawing.Point(330, 606);
             this.btnClearList.Name = "btnClearList";
             this.btnClearList.Size = new System.Drawing.Size(75, 23);
             this.btnClearList.TabIndex = 1;
@@ -135,31 +153,33 @@
             // 
             this.btnDeleteSelected.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnDeleteSelected.ForeColor = System.Drawing.Color.Red;
-            this.btnDeleteSelected.Location = new System.Drawing.Point(249, 605);
+            this.btnDeleteSelected.Location = new System.Drawing.Point(249, 606);
             this.btnDeleteSelected.Name = "btnDeleteSelected";
             this.btnDeleteSelected.Size = new System.Drawing.Size(75, 23);
             this.btnDeleteSelected.TabIndex = 1;
             this.btnDeleteSelected.TabStop = false;
             this.btnDeleteSelected.Text = "删除所选";
+            this.tip.SetToolTip(this.btnDeleteSelected, "从列表中删除选中项（包括本地文件）");
             this.btnDeleteSelected.UseVisualStyleBackColor = true;
             this.btnDeleteSelected.Click += new System.EventHandler(this.btnDeleteSelected_Click);
             // 
             // btnRemoveSelected
             // 
             this.btnRemoveSelected.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnRemoveSelected.Location = new System.Drawing.Point(168, 605);
+            this.btnRemoveSelected.Location = new System.Drawing.Point(168, 606);
             this.btnRemoveSelected.Name = "btnRemoveSelected";
             this.btnRemoveSelected.Size = new System.Drawing.Size(75, 23);
             this.btnRemoveSelected.TabIndex = 1;
             this.btnRemoveSelected.TabStop = false;
             this.btnRemoveSelected.Text = "移除所选";
+            this.tip.SetToolTip(this.btnRemoveSelected, "从列表中移除选中项（不包括本地文件）");
             this.btnRemoveSelected.UseVisualStyleBackColor = true;
             this.btnRemoveSelected.Click += new System.EventHandler(this.btnRemoveSelected_Click);
             // 
             // btnAddFolder
             // 
             this.btnAddFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnAddFolder.Location = new System.Drawing.Point(87, 605);
+            this.btnAddFolder.Location = new System.Drawing.Point(87, 606);
             this.btnAddFolder.Name = "btnAddFolder";
             this.btnAddFolder.Size = new System.Drawing.Size(75, 23);
             this.btnAddFolder.TabIndex = 1;
@@ -171,7 +191,7 @@
             // btnAddFile
             // 
             this.btnAddFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnAddFile.Location = new System.Drawing.Point(6, 605);
+            this.btnAddFile.Location = new System.Drawing.Point(6, 606);
             this.btnAddFile.Name = "btnAddFile";
             this.btnAddFile.Size = new System.Drawing.Size(75, 23);
             this.btnAddFile.TabIndex = 0;
@@ -198,7 +218,7 @@
             this.lvFileList.HideSelection = false;
             this.lvFileList.Location = new System.Drawing.Point(6, 18);
             this.lvFileList.Name = "lvFileList";
-            this.lvFileList.Size = new System.Drawing.Size(570, 581);
+            this.lvFileList.Size = new System.Drawing.Size(570, 582);
             this.lvFileList.TabIndex = 0;
             this.lvFileList.TabStop = false;
             this.lvFileList.UseCompatibleStateImageBehavior = false;
@@ -243,6 +263,7 @@
             // grpConfig
             // 
             this.grpConfig.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.grpConfig.Controls.Add(this.numericSleepTimeForAutoPlay);
             this.grpConfig.Controls.Add(this.comboPlaySpeed);
             this.grpConfig.Controls.Add(this.btnSortFolder5);
             this.grpConfig.Controls.Add(this.chkListAuto);
@@ -261,14 +282,44 @@
             this.grpConfig.Controls.Add(this.labelSortFolder3);
             this.grpConfig.Controls.Add(this.labelSortFolder2);
             this.grpConfig.Controls.Add(this.labelSortFolder1);
+            this.grpConfig.Controls.Add(this.labelSleepTimeForAutoPlay);
             this.grpConfig.Controls.Add(this.labelPlaySpeed);
             this.grpConfig.Controls.Add(this.labelStep);
             this.grpConfig.Location = new System.Drawing.Point(608, 12);
             this.grpConfig.Name = "grpConfig";
-            this.grpConfig.Size = new System.Drawing.Size(315, 236);
+            this.grpConfig.Size = new System.Drawing.Size(315, 235);
             this.grpConfig.TabIndex = 1;
             this.grpConfig.TabStop = false;
             this.grpConfig.Text = "设置";
+            // 
+            // numericSleepTimeForAutoPlay
+            // 
+            this.numericSleepTimeForAutoPlay.Location = new System.Drawing.Point(229, 202);
+            this.numericSleepTimeForAutoPlay.Name = "numericSleepTimeForAutoPlay";
+            this.numericSleepTimeForAutoPlay.Size = new System.Drawing.Size(50, 21);
+            this.numericSleepTimeForAutoPlay.TabIndex = 7;
+            this.numericSleepTimeForAutoPlay.TabStop = false;
+            this.numericSleepTimeForAutoPlay.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.tip.SetToolTip(this.numericSleepTimeForAutoPlay, "自动切换下条音频前等待的时间");
+            // 
+            // comboPlaySpeed
+            // 
+            this.comboPlaySpeed.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboPlaySpeed.FormattingEnabled = true;
+            this.comboPlaySpeed.Items.AddRange(new object[] {
+            "0.50",
+            "0.75",
+            "1.00",
+            "1.25",
+            "1.50",
+            "2.00",
+            "2.50"});
+            this.comboPlaySpeed.Location = new System.Drawing.Point(229, 173);
+            this.comboPlaySpeed.Name = "comboPlaySpeed";
+            this.comboPlaySpeed.Size = new System.Drawing.Size(50, 20);
+            this.comboPlaySpeed.TabIndex = 11;
+            this.tip.SetToolTip(this.comboPlaySpeed, "部分格式（如FLAC）不支持倍速播放");
+            this.comboPlaySpeed.SelectedIndexChanged += new System.EventHandler(this.comboPlaySpeed_SelectedIndexChanged);
             // 
             // btnSortFolder5
             // 
@@ -283,16 +334,19 @@
             // 
             // chkListAuto
             // 
+            this.chkListAuto.AutoSize = true;
             this.chkListAuto.Checked = true;
             this.chkListAuto.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkListAuto.Location = new System.Drawing.Point(173, 173);
+            this.chkListAuto.Location = new System.Drawing.Point(22, 205);
             this.chkListAuto.Name = "chkListAuto";
-            this.chkListAuto.Size = new System.Drawing.Size(107, 23);
+            this.chkListAuto.Size = new System.Drawing.Size(96, 16);
             this.chkListAuto.TabIndex = 6;
             this.chkListAuto.TabStop = false;
             this.chkListAuto.Text = "列表自动播放";
             this.chkListAuto.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.tip.SetToolTip(this.chkListAuto, "当前音频播放完毕后自动切换至下一条");
             this.chkListAuto.UseVisualStyleBackColor = true;
+            this.chkListAuto.CheckedChanged += new System.EventHandler(this.chkListAuto_CheckedChanged);
             // 
             // btnSortFolder4
             // 
@@ -346,6 +400,7 @@
             this.numericStep.TabIndex = 7;
             this.numericStep.TabStop = false;
             this.numericStep.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.tip.SetToolTip(this.numericStep, "每次快进/快退的时间长度");
             this.numericStep.Value = new decimal(new int[] {
             2,
             0,
@@ -437,14 +492,25 @@
             this.labelSortFolder1.TabIndex = 0;
             this.labelSortFolder1.Text = "分类目录1";
             // 
+            // labelSleepTimeForAutoPlay
+            // 
+            this.labelSleepTimeForAutoPlay.AutoSize = true;
+            this.labelSleepTimeForAutoPlay.Location = new System.Drawing.Point(129, 206);
+            this.labelSleepTimeForAutoPlay.Name = "labelSleepTimeForAutoPlay";
+            this.labelSleepTimeForAutoPlay.Size = new System.Drawing.Size(173, 12);
+            this.labelSleepTimeForAutoPlay.TabIndex = 9;
+            this.labelSleepTimeForAutoPlay.Text = "切换下条前等待            秒";
+            this.tip.SetToolTip(this.labelSleepTimeForAutoPlay, "自动切换下条音频前等待的时间");
+            // 
             // labelPlaySpeed
             // 
             this.labelPlaySpeed.AutoSize = true;
-            this.labelPlaySpeed.Location = new System.Drawing.Point(19, 206);
+            this.labelPlaySpeed.Location = new System.Drawing.Point(165, 177);
             this.labelPlaySpeed.Name = "labelPlaySpeed";
-            this.labelPlaySpeed.Size = new System.Drawing.Size(287, 12);
+            this.labelPlaySpeed.Size = new System.Drawing.Size(137, 12);
             this.labelPlaySpeed.TabIndex = 9;
-            this.labelPlaySpeed.Text = "播放速度            倍   部分格式不支持倍速播放";
+            this.labelPlaySpeed.Text = "播放速度            倍";
+            this.tip.SetToolTip(this.labelPlaySpeed, "部分格式（如FLAC）不支持倍速播放");
             // 
             // labelStep
             // 
@@ -454,10 +520,12 @@
             this.labelStep.Size = new System.Drawing.Size(137, 12);
             this.labelStep.TabIndex = 9;
             this.labelStep.Text = "进退步长            秒";
+            this.tip.SetToolTip(this.labelStep, "每次快进/快退的时间长度");
             // 
             // grpPlaycontrol
             // 
             this.grpPlaycontrol.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.grpPlaycontrol.Controls.Add(this.labelPlayprogressString);
             this.grpPlaycontrol.Controls.Add(this.labelVolume);
             this.grpPlaycontrol.Controls.Add(this.labelShortcut1);
             this.grpPlaycontrol.Controls.Add(this.tckbarVolume);
@@ -469,8 +537,7 @@
             this.grpPlaycontrol.Controls.Add(this.btnNext);
             this.grpPlaycontrol.Controls.Add(this.btnPrevious);
             this.grpPlaycontrol.Controls.Add(this.wmp);
-            this.grpPlaycontrol.Enabled = false;
-            this.grpPlaycontrol.Location = new System.Drawing.Point(608, 254);
+            this.grpPlaycontrol.Location = new System.Drawing.Point(608, 253);
             this.grpPlaycontrol.Name = "grpPlaycontrol";
             this.grpPlaycontrol.Size = new System.Drawing.Size(315, 223);
             this.grpPlaycontrol.TabIndex = 2;
@@ -506,13 +573,14 @@
             this.tckbarVolume.TabIndex = 4;
             this.tckbarVolume.TabStop = false;
             this.tckbarVolume.TickFrequency = 20;
+            this.tip.SetToolTip(this.tckbarVolume, "音量：100");
             this.tckbarVolume.Value = 100;
             this.tckbarVolume.ValueChanged += new System.EventHandler(this.tckbarVolume_ValueChanged);
             // 
             // tckbarPlayprogress
             // 
             this.tckbarPlayprogress.AutoSize = false;
-            this.tckbarPlayprogress.Location = new System.Drawing.Point(6, 75);
+            this.tckbarPlayprogress.Location = new System.Drawing.Point(6, 65);
             this.tckbarPlayprogress.Maximum = 100;
             this.tckbarPlayprogress.Name = "tckbarPlayprogress";
             this.tckbarPlayprogress.Size = new System.Drawing.Size(302, 27);
@@ -669,11 +737,11 @@
             this.labelAbout.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.labelAbout.AutoSize = true;
             this.labelAbout.Font = new System.Drawing.Font("Times New Roman", 10.5F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelAbout.Location = new System.Drawing.Point(645, 632);
+            this.labelAbout.Location = new System.Drawing.Point(645, 633);
             this.labelAbout.Name = "labelAbout";
             this.labelAbout.Size = new System.Drawing.Size(240, 17);
             this.labelAbout.TabIndex = 4;
-            this.labelAbout.Text = "Audio Dataset Screener 1.1.0 by 2DIPW";
+            this.labelAbout.Text = "Audio Dataset Screener 1.2.0 by 2DIPW";
             // 
             // labelShortcut2
             // 
@@ -699,7 +767,7 @@
             this.grpAction.Controls.Add(this.btnToFolder5);
             this.grpAction.Controls.Add(this.btnDelete);
             this.grpAction.Enabled = false;
-            this.grpAction.Location = new System.Drawing.Point(608, 483);
+            this.grpAction.Location = new System.Drawing.Point(608, 482);
             this.grpAction.Name = "grpAction";
             this.grpAction.Size = new System.Drawing.Size(315, 146);
             this.grpAction.TabIndex = 6;
@@ -747,29 +815,31 @@
             this.btnCancelSelectedActions.UseVisualStyleBackColor = true;
             this.btnCancelSelectedActions.Click += new System.EventHandler(this.btnCancelSelectedActions_Click);
             // 
-            // comboPlaySpeed
+            // timerSleep
             // 
-            this.comboPlaySpeed.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboPlaySpeed.FormattingEnabled = true;
-            this.comboPlaySpeed.Items.AddRange(new object[] {
-            "0.50",
-            "0.75",
-            "1.00",
-            "1.25",
-            "1.50",
-            "2.00",
-            "2.50"});
-            this.comboPlaySpeed.Location = new System.Drawing.Point(83, 202);
-            this.comboPlaySpeed.Name = "comboPlaySpeed";
-            this.comboPlaySpeed.Size = new System.Drawing.Size(50, 20);
-            this.comboPlaySpeed.TabIndex = 11;
-            this.comboPlaySpeed.SelectedIndexChanged += new System.EventHandler(this.comboPlaySpeed_SelectedIndexChanged);
+            this.timerSleep.Tick += new System.EventHandler(this.timerSleep_Tick);
+            // 
+            // tip
+            // 
+            this.tip.AutoPopDelay = 5000;
+            this.tip.InitialDelay = 500;
+            this.tip.ReshowDelay = 100;
+            // 
+            // labelPlayprogressString
+            // 
+            this.labelPlayprogressString.AutoSize = true;
+            this.labelPlayprogressString.Location = new System.Drawing.Point(216, 89);
+            this.labelPlayprogressString.Name = "labelPlayprogressString";
+            this.labelPlayprogressString.Size = new System.Drawing.Size(83, 12);
+            this.labelPlayprogressString.TabIndex = 2;
+            this.labelPlayprogressString.Text = "00:00 / 00:00";
+            this.labelPlayprogressString.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(931, 660);
+            this.ClientSize = new System.Drawing.Size(931, 661);
             this.Controls.Add(this.grpAction);
             this.Controls.Add(this.labelAbout);
             this.Controls.Add(this.grpPlaycontrol);
@@ -777,7 +847,7 @@
             this.Controls.Add(this.grpFileList);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
-            this.MinimumSize = new System.Drawing.Size(947, 673);
+            this.MinimumSize = new System.Drawing.Size(947, 700);
             this.Name = "frmMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Audio Dataset Screener";
@@ -787,6 +857,7 @@
             this.grpFileList.ResumeLayout(false);
             this.grpConfig.ResumeLayout(false);
             this.grpConfig.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericSleepTimeForAutoPlay)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericStep)).EndInit();
             this.grpPlaycontrol.ResumeLayout(false);
             this.grpPlaycontrol.PerformLayout();
@@ -863,6 +934,12 @@
         private System.Windows.Forms.Button btnApplySelectedActions;
         private System.Windows.Forms.Label labelPlaySpeed;
         private System.Windows.Forms.ComboBox comboPlaySpeed;
+        private System.Windows.Forms.NumericUpDown numericSleepTimeForAutoPlay;
+        private System.Windows.Forms.Label labelSleepTimeForAutoPlay;
+        private System.Windows.Forms.Timer timerSleep;
+        private System.Windows.Forms.ToolTip tip;
+        private System.Windows.Forms.ProgressBar processBar;
+        private System.Windows.Forms.Label labelPlayprogressString;
     }
 }
 

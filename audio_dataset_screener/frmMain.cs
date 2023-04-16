@@ -21,6 +21,7 @@ namespace audio_dataset_screener
     {
         private int current_playing; //记录当前播放项序号
         private int sortColumn = -1;//点击表头升序或降序排列
+        private PlaybackProgress playbackProgress;
         public frmMain()
         {
             InitializeComponent();
@@ -33,6 +34,7 @@ namespace audio_dataset_screener
             wmp.enableContextMenu = false;
             wmp.settings.autoStart = false;
             comboPlaySpeed.SelectedIndex = 2;
+            playbackProgress = new PlaybackProgress(wmp);
         }
 
         #region 共用方法
@@ -48,7 +50,7 @@ namespace audio_dataset_screener
             {
                 foreach (ListViewItem item in lvFileList.Items)//重置所有列表项的播放标记和选中情况
                 {
-                    item.SubItems[0].Text = ""; 
+                    item.SubItems[0].Text = "";
                     item.Selected = false;
                 }
                 lvFileList.Items[index].SubItems[0].Text = "▶"; //在当前播放项前加上标记符号
@@ -61,9 +63,11 @@ namespace audio_dataset_screener
             }
             labelFileCounter.Text = $"{(current_playing + 1).ToString()}/{lvFileList.Items.Count.ToString()}"; //更新播放项指示label
         }
+        private delegate void set_progressbar_value(int value);
 
         private void wmp_stop()
         {
+            timerSleep.Stop();
             wmp.Ctlcontrols.stop();
             timerPlay.Stop();//进度条停止走动
             tckbarPlayprogress.Value = 0;
@@ -77,6 +81,7 @@ namespace audio_dataset_screener
         }
         private void wmp_play()
         {
+            timerSleep.Stop();
             if (comboPlaySpeed.SelectedIndex != 2)//wmp的播放速度不是全局设置，经常会被重置。当速度不是1x，只要开始播放就重新设置倍速。
             {
                 apply_playspeed();
@@ -86,12 +91,14 @@ namespace audio_dataset_screener
 ;        }
         private void wmp_pause()
         {
+            timerSleep.Stop();
             wmp.Ctlcontrols.pause();
             timerPlay.Stop();//进度条停止走动
         }
 
         private void wmp_next()
         {
+            timerSleep.Stop();
             if (current_playing == lvFileList.Items.Count - 1)
             {
                 set_current_playing(0);//列表循环
@@ -105,6 +112,7 @@ namespace audio_dataset_screener
 
         private void wmp_previous()
         {
+            timerSleep.Stop();
             if (current_playing == 0)
             {
                 set_current_playing(lvFileList.Items.Count - 1);//列表循环
@@ -128,8 +136,15 @@ namespace audio_dataset_screener
         {
             System.Windows.Forms.TextBox[] folder_paths = { txtboxSortFolder1, txtboxSortFolder2, txtboxSortFolder3, txtboxSortFolder4, txtboxSortFolder5 };
 
+            lvFileList.BeginUpdate();
+
             int total_amount = items.Count;
             int succeed_amount = 0;
+
+            processBar.Maximum = total_amount;
+            processBar.Value = 0;
+            processBar.Visible = true;
+            
 
             foreach (ListViewItem item in items)
             {
@@ -160,7 +175,11 @@ namespace audio_dataset_screener
                         catch { }
                         break;
                 }
+                processBar.PerformStep();
+                
             }
+            processBar.Visible = false;
+            lvFileList.EndUpdate();
             return (total_amount, succeed_amount);
         }
         #endregion
@@ -171,6 +190,8 @@ namespace audio_dataset_screener
             wmp_stop();
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
+                lvFileList.BeginUpdate();
+
                 string[] paths = openFileDialog.FileNames;
 
                 List<string> existed_paths_in_filelist = new List<string>();
@@ -181,6 +202,11 @@ namespace audio_dataset_screener
 
                 int total_amount = paths.Length;
                 int succeed_amount = 0;
+
+                processBar.Maximum = total_amount;
+                processBar.Value = 0;
+                processBar.Visible = true;
+                
 
                 foreach (string path in paths)
                 {
@@ -200,9 +226,16 @@ namespace audio_dataset_screener
                         }
                     }
                     catch { }
+                    processBar.PerformStep();
+                    
                 }
                 set_current_playing(0);//添加文件后重置当前播放项
-                if(total_amount - succeed_amount > 0)
+
+                processBar.Visible = false;
+
+                lvFileList.EndUpdate();
+
+                if (total_amount - succeed_amount > 0)
                 {
                     MessageBox.Show($"已成功添加{succeed_amount.ToString()}个文件，但失败{(total_amount - succeed_amount).ToString()}个\n可能是因为您选择了列表中已存在的文件或非音频文件", "存在错误", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
@@ -216,6 +249,8 @@ namespace audio_dataset_screener
             wmp_stop();
             if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
             {
+                lvFileList.BeginUpdate();
+
                 DirectoryInfo dir = new DirectoryInfo(folderBrowserDialog.SelectedPath);
                 FileInfo[] file = dir.GetFiles();
 
@@ -228,6 +263,11 @@ namespace audio_dataset_screener
 
                 int total_amount = file.Length;
                 int succeed_amount = 0;
+
+                processBar.Maximum = total_amount;
+                processBar.Value = 0;
+                processBar.Visible = true;
+                
 
 
                 foreach (FileInfo f in file)
@@ -248,9 +288,15 @@ namespace audio_dataset_screener
                         }
                     }
                     catch { }
+                    processBar.PerformStep();
                     
                 }
+
                 set_current_playing(0);//添加文件后重置当前播放
+
+                processBar.Visible = false;
+
+                lvFileList.EndUpdate();
 
                 if (total_amount - succeed_amount > 0)
                 {
@@ -263,13 +309,20 @@ namespace audio_dataset_screener
         {
             if (lvFileList.SelectedItems.Count > 0)
             {
+                lvFileList.BeginUpdate();
                 wmp_stop();
                 int last_selected_index = lvFileList.SelectedItems[lvFileList.SelectedItems.Count - 1].Index;
 
+                processBar.Maximum = lvFileList.SelectedItems.Count;
+                processBar.Value = 0;
+                processBar.Visible = true;
+                
 
                 foreach (ListViewItem item in lvFileList.SelectedItems)
                 {
                     item.Remove();
+                    processBar.PerformStep();
+                    
                 }
 
                 try
@@ -280,6 +333,11 @@ namespace audio_dataset_screener
                 {
                     set_current_playing(lvFileList.Items.Count == 0 ? 0 : lvFileList.Items.Count - 1);//如果不成功，若文件列表已空，则重置，不为空则设为最后一项
                 }
+
+                processBar.Visible = false;
+
+                lvFileList.EndUpdate();
+
             }
         }
         private void btnDeleteSelected_Click(object sender, EventArgs e) //删除选中项
@@ -290,11 +348,17 @@ namespace audio_dataset_screener
                 {
                     return;
                 }
+                lvFileList.BeginUpdate();
                 wmp_stop();
 
                 int total_amount = lvFileList.SelectedItems.Count;
                 int succeed_amount = 0;
                 int last_selected_index = lvFileList.SelectedItems[total_amount - 1].Index;
+
+                processBar.Maximum = lvFileList.SelectedItems.Count;
+                processBar.Value = 0;
+                processBar.Visible = true;
+                
 
                 foreach (ListViewItem item in lvFileList.SelectedItems)
                 {
@@ -305,7 +369,13 @@ namespace audio_dataset_screener
                         succeed_amount++;
                     }
                     catch { }
+                    processBar.PerformStep();
+                    
                 }
+
+                processBar.Visible = false;
+
+                lvFileList.EndUpdate();
 
                 if (total_amount - succeed_amount > 0)
                 {
@@ -385,13 +455,13 @@ namespace audio_dataset_screener
 
         private void btnRew_Click(object sender, EventArgs e) //快退
         {
-            double position = wmp.Ctlcontrols.currentPosition - (double)numericStep.Value;
-            wmp.Ctlcontrols.currentPosition = position <= 0 ? 0 : position;//如果快退后播放位置<=0，则直接设为0
+            int position = playbackProgress.CurrentPosition - (int)numericStep.Value*1000;
+            playbackProgress.CurrentPosition = position <= 0 ? 0 : position;//如果快退后播放位置<=0，则直接设为0
         }
         private void btnFF_Click(object sender, EventArgs e) //快进
         {
-            double position = wmp.Ctlcontrols.currentPosition + (double)numericStep.Value;
-            if(position>= wmp.currentMedia.duration)
+            int position = playbackProgress.CurrentPosition + (int)numericStep.Value * 1000;
+            if(position>= playbackProgress.Duration)
             {
                 if (chkListAuto.Checked)
                 {
@@ -404,7 +474,7 @@ namespace audio_dataset_screener
             }
             else
             {
-                wmp.Ctlcontrols.currentPosition = position; 
+                playbackProgress.CurrentPosition = position; 
             }
             
         }
@@ -412,6 +482,7 @@ namespace audio_dataset_screener
         private void tckbarVolume_ValueChanged(object sender, EventArgs e)//音量条
         {
             wmp.settings.volume = tckbarVolume.Value;
+            tip.SetToolTip(tckbarVolume, $"音量：{tckbarVolume.Value}");
         }
         private void comboPlaySpeed_SelectedIndexChanged(object sender, EventArgs e)//倍速选择
         {
@@ -423,7 +494,15 @@ namespace audio_dataset_screener
             {
                 if (chkListAuto.Checked)
                 {
-                    BeginInvoke(new Action(() => { wmp_next(); }));
+                    if (numericSleepTimeForAutoPlay.Value == 0)
+                    {
+                        BeginInvoke(new Action(() => { wmp_next(); }));
+                    }
+                    else
+                    {
+                        timerSleep.Interval = (int)numericSleepTimeForAutoPlay.Value * 1000;
+                        timerSleep.Start();
+                    }
                 }
                 else
                 {
@@ -432,15 +511,24 @@ namespace audio_dataset_screener
             }
             
         }
-
+        private void timerSleep_Tick(object sender, EventArgs e)
+        {
+            BeginInvoke(new Action(() => { wmp_next(); }));
+        }
         private void timerPlay_Tick(object sender, EventArgs e) //实时播放进度条
         {
             try
             {
-                tckbarPlayprogress.Maximum = (int)wmp.currentMedia.duration;
-                tckbarPlayprogress.Value = (int)wmp.Ctlcontrols.currentPosition;
+                tckbarPlayprogress.Maximum = playbackProgress.Duration;
+                tckbarPlayprogress.Value = playbackProgress.CurrentPosition;
+                labelPlayprogressString.Text = $"{playbackProgress.CurrentPostionString} / {playbackProgress.DurationString}";
             }
             catch { }
+        }
+        private void MoveTrackBarToMouseClickLocation(System.Windows.Forms.TrackBar trackbar, int a_mouseX)
+        {
+            double dblValue = ((double)a_mouseX / (double)trackbar.Width) * (trackbar.Maximum - trackbar.Minimum);
+            trackbar.Value = (int)dblValue;
         }
         private void tckbarPlayprogress_MouseDown(object sender, MouseEventArgs e)
         {
@@ -448,7 +536,8 @@ namespace audio_dataset_screener
         }
         private void tckbarPlayprogress_MouseUp(object sender, MouseEventArgs e)
         {
-            wmp.Ctlcontrols.currentPosition = (double)tckbarPlayprogress.Value;
+            MoveTrackBarToMouseClickLocation(tckbarPlayprogress, e.X);
+            playbackProgress.CurrentPosition = tckbarPlayprogress.Value;
             timerPlay.Start();
         }
 
@@ -651,7 +740,17 @@ namespace audio_dataset_screener
             }
             
         }
-
+        private void chkListAuto_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chkListAuto.Checked)
+            {
+                numericSleepTimeForAutoPlay.Enabled = true;
+            }
+            else
+            {
+                numericSleepTimeForAutoPlay.Enabled = false;
+            }
+        }
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
             foreach (ListViewItem item in lvFileList.Items)//判断是否还有未应用的动作
@@ -672,5 +771,6 @@ namespace audio_dataset_screener
             }
             
         }
+
     }
 }
