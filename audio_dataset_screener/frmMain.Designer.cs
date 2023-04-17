@@ -68,6 +68,7 @@
             this.labelPlaySpeed = new System.Windows.Forms.Label();
             this.labelStep = new System.Windows.Forms.Label();
             this.grpPlaycontrol = new System.Windows.Forms.GroupBox();
+            this.labelPlayprogressString = new System.Windows.Forms.Label();
             this.labelVolume = new System.Windows.Forms.Label();
             this.labelShortcut1 = new System.Windows.Forms.Label();
             this.tckbarVolume = new System.Windows.Forms.TrackBar();
@@ -96,7 +97,6 @@
             this.btnCancelSelectedActions = new System.Windows.Forms.Button();
             this.timerSleep = new System.Windows.Forms.Timer(this.components);
             this.tip = new System.Windows.Forms.ToolTip(this.components);
-            this.labelPlayprogressString = new System.Windows.Forms.Label();
             this.grpFileList.SuspendLayout();
             this.grpConfig.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericSleepTimeForAutoPlay)).BeginInit();
@@ -202,7 +202,6 @@
             // 
             // lvFileList
             // 
-            this.lvFileList.AllowColumnReorder = true;
             this.lvFileList.AllowDrop = true;
             this.lvFileList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
@@ -537,12 +536,23 @@
             this.grpPlaycontrol.Controls.Add(this.btnNext);
             this.grpPlaycontrol.Controls.Add(this.btnPrevious);
             this.grpPlaycontrol.Controls.Add(this.wmp);
+            this.grpPlaycontrol.Enabled = false;
             this.grpPlaycontrol.Location = new System.Drawing.Point(608, 253);
             this.grpPlaycontrol.Name = "grpPlaycontrol";
             this.grpPlaycontrol.Size = new System.Drawing.Size(315, 223);
             this.grpPlaycontrol.TabIndex = 2;
             this.grpPlaycontrol.TabStop = false;
             this.grpPlaycontrol.Text = "播放控制";
+            // 
+            // labelPlayprogressString
+            // 
+            this.labelPlayprogressString.AutoSize = true;
+            this.labelPlayprogressString.Location = new System.Drawing.Point(216, 89);
+            this.labelPlayprogressString.Name = "labelPlayprogressString";
+            this.labelPlayprogressString.Size = new System.Drawing.Size(83, 12);
+            this.labelPlayprogressString.TabIndex = 2;
+            this.labelPlayprogressString.Text = "00:00 / 00:00";
+            this.labelPlayprogressString.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // labelVolume
             // 
@@ -736,12 +746,14 @@
             // 
             this.labelAbout.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.labelAbout.AutoSize = true;
+            this.labelAbout.Cursor = System.Windows.Forms.Cursors.Hand;
             this.labelAbout.Font = new System.Drawing.Font("Times New Roman", 10.5F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelAbout.Location = new System.Drawing.Point(645, 633);
             this.labelAbout.Name = "labelAbout";
             this.labelAbout.Size = new System.Drawing.Size(240, 17);
             this.labelAbout.TabIndex = 4;
             this.labelAbout.Text = "Audio Dataset Screener 1.2.0 by 2DIPW";
+            this.labelAbout.Click += new System.EventHandler(this.labelAbout_Click);
             // 
             // labelShortcut2
             // 
@@ -824,16 +836,6 @@
             this.tip.AutoPopDelay = 5000;
             this.tip.InitialDelay = 500;
             this.tip.ReshowDelay = 100;
-            // 
-            // labelPlayprogressString
-            // 
-            this.labelPlayprogressString.AutoSize = true;
-            this.labelPlayprogressString.Location = new System.Drawing.Point(216, 89);
-            this.labelPlayprogressString.Name = "labelPlayprogressString";
-            this.labelPlayprogressString.Size = new System.Drawing.Size(83, 12);
-            this.labelPlayprogressString.TabIndex = 2;
-            this.labelPlayprogressString.Text = "00:00 / 00:00";
-            this.labelPlayprogressString.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // frmMain
             // 

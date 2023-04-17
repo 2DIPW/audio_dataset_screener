@@ -34,7 +34,7 @@ namespace audio_dataset_screener
             wmp.enableContextMenu = false;
             wmp.settings.autoStart = false;
             comboPlaySpeed.SelectedIndex = 2;
-            playbackProgress = new PlaybackProgress(wmp);
+            playbackProgress = new PlaybackProgress(wmp);//播放进度类
         }
 
         #region 共用方法
@@ -67,7 +67,7 @@ namespace audio_dataset_screener
 
         private void wmp_stop()
         {
-            timerSleep.Stop();
+            timerSleep.Stop();//取消已进入延时等待的切换下一条操作
             wmp.Ctlcontrols.stop();
             timerPlay.Stop();//进度条停止走动
             tckbarPlayprogress.Value = 0;
@@ -81,7 +81,7 @@ namespace audio_dataset_screener
         }
         private void wmp_play()
         {
-            timerSleep.Stop();
+            timerSleep.Stop();//取消已进入延时等待的切换下一条操作
             if (comboPlaySpeed.SelectedIndex != 2)//wmp的播放速度不是全局设置，经常会被重置。当速度不是1x，只要开始播放就重新设置倍速。
             {
                 apply_playspeed();
@@ -91,14 +91,14 @@ namespace audio_dataset_screener
 ;        }
         private void wmp_pause()
         {
-            timerSleep.Stop();
+            timerSleep.Stop();//取消已进入延时等待的切换下一条操作
             wmp.Ctlcontrols.pause();
             timerPlay.Stop();//进度条停止走动
         }
 
         private void wmp_next()
         {
-            timerSleep.Stop();
+            timerSleep.Stop();//取消已进入延时等待的切换下一条操作
             if (current_playing == lvFileList.Items.Count - 1)
             {
                 set_current_playing(0);//列表循环
@@ -112,7 +112,7 @@ namespace audio_dataset_screener
 
         private void wmp_previous()
         {
-            timerSleep.Stop();
+            timerSleep.Stop();//取消已进入延时等待的切换下一条操作
             if (current_playing == 0)
             {
                 set_current_playing(lvFileList.Items.Count - 1);//列表循环
@@ -455,28 +455,33 @@ namespace audio_dataset_screener
 
         private void btnRew_Click(object sender, EventArgs e) //快退
         {
-            int position = playbackProgress.CurrentPosition - (int)numericStep.Value*1000;
-            playbackProgress.CurrentPosition = position <= 0 ? 0 : position;//如果快退后播放位置<=0，则直接设为0
+            if (wmp.playState.ToString() == "wmppsPlaying" | wmp.playState.ToString() == "wmppsScanForward")
+            {
+                int position = playbackProgress.CurrentPosition - (int)numericStep.Value * 1000;
+                playbackProgress.CurrentPosition = position <= 0 ? 0 : position;//如果快退后播放位置<=0，则直接设为0
+            }
         }
         private void btnFF_Click(object sender, EventArgs e) //快进
         {
-            int position = playbackProgress.CurrentPosition + (int)numericStep.Value * 1000;
-            if(position>= playbackProgress.Duration)
+            if (wmp.playState.ToString() == "wmppsPlaying" | wmp.playState.ToString() == "wmppsScanForward")
             {
-                if (chkListAuto.Checked)
+                int position = playbackProgress.CurrentPosition + (int)numericStep.Value * 1000;
+                if (position >= playbackProgress.Duration)
                 {
-                    wmp_next();
+                    if (chkListAuto.Checked)
+                    {
+                        wmp_next();
+                    }
+                    else
+                    {
+                        wmp_stop();
+                    }
                 }
                 else
                 {
-                    wmp_stop();
+                    playbackProgress.CurrentPosition = position;
                 }
             }
-            else
-            {
-                playbackProgress.CurrentPosition = position; 
-            }
-            
         }
 
         private void tckbarVolume_ValueChanged(object sender, EventArgs e)//音量条
@@ -772,5 +777,9 @@ namespace audio_dataset_screener
             
         }
 
+        private void labelAbout_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://github.com/2DIPW/audio_dataset_screener");
+        }
     }
 }
