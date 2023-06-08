@@ -36,7 +36,13 @@
             this.btnDeleteSelected = new System.Windows.Forms.Button();
             this.btnRemoveSelected = new System.Windows.Forms.Button();
             this.btnProject = new System.Windows.Forms.Button();
+            this.ctMenuProject = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.toolStripMenuItemOpenProject = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItemSaveProject = new System.Windows.Forms.ToolStripMenuItem();
             this.btnAdd = new System.Windows.Forms.Button();
+            this.ctMenuAdd = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.toolStripMenuItemAddFile = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItemAddFolder = new System.Windows.Forms.ToolStripMenuItem();
             this.lvFileList = new System.Windows.Forms.ListView();
             this.chPlaying = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.chAction = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -102,13 +108,9 @@
             this.labelReplace = new System.Windows.Forms.Label();
             this.timerSleep = new System.Windows.Forms.Timer(this.components);
             this.tip = new System.Windows.Forms.ToolTip(this.components);
-            this.ctMenuAdd = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.toolStripMenuItemAddFile = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItemAddFolder = new System.Windows.Forms.ToolStripMenuItem();
-            this.ctMenuProject = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.toolStripMenuItemOpenProject = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItemSaveProject = new System.Windows.Forms.ToolStripMenuItem();
             this.grpFileList.SuspendLayout();
+            this.ctMenuProject.SuspendLayout();
+            this.ctMenuAdd.SuspendLayout();
             this.grpConfig.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericSleepTimeForAutoPlay)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericStep)).BeginInit();
@@ -117,8 +119,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.tckbarPlayprogress)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.wmp)).BeginInit();
             this.grpAction.SuspendLayout();
-            this.ctMenuAdd.SuspendLayout();
-            this.ctMenuProject.SuspendLayout();
             this.SuspendLayout();
             // 
             // grpFileList
@@ -203,6 +203,28 @@
             this.btnProject.UseVisualStyleBackColor = true;
             this.btnProject.Click += new System.EventHandler(this.btnProject_Click);
             // 
+            // ctMenuProject
+            // 
+            this.ctMenuProject.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItemOpenProject,
+            this.toolStripMenuItemSaveProject});
+            this.ctMenuProject.Name = "ctMenuAdd";
+            this.ctMenuProject.Size = new System.Drawing.Size(138, 48);
+            // 
+            // toolStripMenuItemOpenProject
+            // 
+            this.toolStripMenuItemOpenProject.Name = "toolStripMenuItemOpenProject";
+            this.toolStripMenuItemOpenProject.Size = new System.Drawing.Size(137, 22);
+            this.toolStripMenuItemOpenProject.Text = "打开工程 ...";
+            this.toolStripMenuItemOpenProject.Click += new System.EventHandler(this.toolStripMenuItemOpenProject_Click);
+            // 
+            // toolStripMenuItemSaveProject
+            // 
+            this.toolStripMenuItemSaveProject.Name = "toolStripMenuItemSaveProject";
+            this.toolStripMenuItemSaveProject.Size = new System.Drawing.Size(137, 22);
+            this.toolStripMenuItemSaveProject.Text = "保存工程 ...";
+            this.toolStripMenuItemSaveProject.Click += new System.EventHandler(this.toolStripMenuItemSaveProject_Click);
+            // 
             // btnAdd
             // 
             this.btnAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -215,6 +237,28 @@
             this.btnAdd.Text = "添加项目";
             this.btnAdd.UseVisualStyleBackColor = true;
             this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
+            // 
+            // ctMenuAdd
+            // 
+            this.ctMenuAdd.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItemAddFile,
+            this.toolStripMenuItemAddFolder});
+            this.ctMenuAdd.Name = "ctMenuAdd";
+            this.ctMenuAdd.Size = new System.Drawing.Size(114, 48);
+            // 
+            // toolStripMenuItemAddFile
+            // 
+            this.toolStripMenuItemAddFile.Name = "toolStripMenuItemAddFile";
+            this.toolStripMenuItemAddFile.Size = new System.Drawing.Size(113, 22);
+            this.toolStripMenuItemAddFile.Text = "文件 ...";
+            this.toolStripMenuItemAddFile.Click += new System.EventHandler(this.toolStripMenuItemAddFile_Click);
+            // 
+            // toolStripMenuItemAddFolder
+            // 
+            this.toolStripMenuItemAddFolder.Name = "toolStripMenuItemAddFolder";
+            this.toolStripMenuItemAddFolder.Size = new System.Drawing.Size(113, 22);
+            this.toolStripMenuItemAddFolder.Text = "目录 ...";
+            this.toolStripMenuItemAddFolder.Click += new System.EventHandler(this.toolStripMenuItemAddFolder_Click);
             // 
             // lvFileList
             // 
@@ -914,50 +958,6 @@
             this.tip.InitialDelay = 500;
             this.tip.ReshowDelay = 100;
             // 
-            // ctMenuAdd
-            // 
-            this.ctMenuAdd.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripMenuItemAddFile,
-            this.toolStripMenuItemAddFolder});
-            this.ctMenuAdd.Name = "ctMenuAdd";
-            this.ctMenuAdd.Size = new System.Drawing.Size(114, 48);
-            // 
-            // toolStripMenuItemAddFile
-            // 
-            this.toolStripMenuItemAddFile.Name = "toolStripMenuItemAddFile";
-            this.toolStripMenuItemAddFile.Size = new System.Drawing.Size(113, 22);
-            this.toolStripMenuItemAddFile.Text = "文件 ...";
-            this.toolStripMenuItemAddFile.Click += new System.EventHandler(this.toolStripMenuItemAddFile_Click);
-            // 
-            // toolStripMenuItemAddFolder
-            // 
-            this.toolStripMenuItemAddFolder.Name = "toolStripMenuItemAddFolder";
-            this.toolStripMenuItemAddFolder.Size = new System.Drawing.Size(113, 22);
-            this.toolStripMenuItemAddFolder.Text = "目录 ...";
-            this.toolStripMenuItemAddFolder.Click += new System.EventHandler(this.toolStripMenuItemAddFolder_Click);
-            // 
-            // ctMenuProject
-            // 
-            this.ctMenuProject.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripMenuItemOpenProject,
-            this.toolStripMenuItemSaveProject});
-            this.ctMenuProject.Name = "ctMenuAdd";
-            this.ctMenuProject.Size = new System.Drawing.Size(138, 48);
-            // 
-            // toolStripMenuItemOpenProject
-            // 
-            this.toolStripMenuItemOpenProject.Name = "toolStripMenuItemOpenProject";
-            this.toolStripMenuItemOpenProject.Size = new System.Drawing.Size(180, 22);
-            this.toolStripMenuItemOpenProject.Text = "打开工程 ...";
-            this.toolStripMenuItemOpenProject.Click += new System.EventHandler(this.toolStripMenuItemOpenProject_Click);
-            // 
-            // toolStripMenuItemSaveProject
-            // 
-            this.toolStripMenuItemSaveProject.Name = "toolStripMenuItemSaveProject";
-            this.toolStripMenuItemSaveProject.Size = new System.Drawing.Size(180, 22);
-            this.toolStripMenuItemSaveProject.Text = "保存工程 ...";
-            this.toolStripMenuItemSaveProject.Click += new System.EventHandler(this.toolStripMenuItemSaveProject_Click);
-            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -978,6 +978,8 @@
             this.Load += new System.EventHandler(this.frmMain_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.frmMain_KeyDown);
             this.grpFileList.ResumeLayout(false);
+            this.ctMenuProject.ResumeLayout(false);
+            this.ctMenuAdd.ResumeLayout(false);
             this.grpConfig.ResumeLayout(false);
             this.grpConfig.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericSleepTimeForAutoPlay)).EndInit();
@@ -989,8 +991,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.wmp)).EndInit();
             this.grpAction.ResumeLayout(false);
             this.grpAction.PerformLayout();
-            this.ctMenuAdd.ResumeLayout(false);
-            this.ctMenuProject.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 

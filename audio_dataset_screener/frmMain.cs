@@ -66,7 +66,6 @@ namespace audio_dataset_screener
             }
             labelFileCounter.Text = $"{(current_playing + 1).ToString()}/{lvFileList.Items.Count.ToString()}"; //更新播放项指示label
         }
-        private delegate void set_progressbar_value(int value);
 
         private void wmp_stop()
         {
@@ -126,6 +125,12 @@ namespace audio_dataset_screener
             }
             wmp_play();
         }
+        private void clear_filelist()
+        {
+            lvFileList.Items.Clear();
+            wmp_stop();
+            set_current_playing(0);
+        }
         private void set_move_action_for_current_playing(int folder_number)//为当前播放添加移动动作标记
         {
             System.Windows.Forms.TextBox[] folder_paths = { txtboxSortFolder1, txtboxSortFolder2, txtboxSortFolder3, txtboxSortFolder4, txtboxSortFolder5 };
@@ -153,6 +158,7 @@ namespace audio_dataset_screener
             processBar.Visible = true;
 
             lvFileList.BeginUpdate();
+            this.Enabled = false;
 
             foreach (string path in paths)
             {
@@ -167,21 +173,129 @@ namespace audio_dataset_screener
                         lvItem.SubItems.Add(soundinfo.FileName);
                         lvItem.SubItems.Add(soundinfo.Duration);
                         lvItem.SubItems.Add(soundinfo.FilePath);
+                        lvItem.SubItems.Add(string.Empty);
                         lvFileList.Items.Add(lvItem);
                         succeed_amount++;
                     }
                 }
                 catch { }
                 processBar.PerformStep();
+                Application.DoEvents();//防止界面卡死，虽然这个方法效率比较低，但是比较简单
 
             }
             set_current_playing(0);//添加文件后重置当前播放项
 
             lvFileList.EndUpdate();
+            this.Enabled = true;
+
             processBar.Visible = false;
             return (total_amount, succeed_amount);
         }
+        private (int, int) load_files_from_json(string json)
+        {
+            List<string> existed_paths_in_filelist = new List<string>();
+            foreach (ListViewItem item in lvFileList.Items)
+            {
+                existed_paths_in_filelist.Add(item.SubItems[4].Text);
+            }//获取当前列表中的所有文件路径
 
+            ProjectData projectData = JsonConvert.DeserializeObject<ProjectData>(json);
+
+            if (projectData.Labels.Count > 5)
+            {
+                MessageBox.Show("工程文件中包含5个以上的分类，序号大于5的分类将被忽略！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            if (projectData.Labels.Count > 0)
+            {
+                System.Windows.Forms.TextBox[] folder_paths = { txtboxSortFolder1, txtboxSortFolder2, txtboxSortFolder3, txtboxSortFolder4, txtboxSortFolder5 };
+                for (int i = 1; i <= 5; i++)
+                {
+                    folder_paths[i - 1].Text = projectData.Labels[i];
+                }
+            }
+
+            if(projectData.Files != null)
+            {
+                int total_amount = projectData.Files.Count;
+                int succeed_amount = 0;
+
+                //设置进度条
+                processBar.Maximum = total_amount;
+                processBar.Value = 0;
+                processBar.Visible = true;
+
+                lvFileList.BeginUpdate();
+                this.Enabled = false;
+
+
+
+                foreach (ProjectFileData file in projectData.Files)
+                {
+                    try
+                    {
+                        SoundInfo soundinfo = new SoundInfo(file.Filepath);
+                        if (soundinfo.Duration != string.Empty & !existed_paths_in_filelist.Contains(soundinfo.FilePath))//如果无法读取时长，则认为不是受支持的音频文件，或如果列表中已存在相同路径的文件，都不予添加
+                        {
+                            ListViewItem lvItem = new ListViewItem();
+                            lvItem.SubItems[0].Text = string.Empty;
+                            lvItem.SubItems.Add((file.Label == 0 | file.Label > 5) ? string.Empty : file.Label.ToString());
+                            lvItem.SubItems.Add(soundinfo.FileName);
+                            lvItem.SubItems.Add(soundinfo.Duration);
+                            lvItem.SubItems.Add(soundinfo.FilePath);
+                            lvItem.SubItems.Add(file.Similarity == 0 ? string.Empty : file.Similarity.ToString("F7"));
+                            lvFileList.Items.Add(lvItem);
+                            succeed_amount++;
+                        }
+                    }
+                    catch { }
+                    processBar.PerformStep();
+                    Application.DoEvents();//防止界面卡死，虽然这个方法效率比较低，但是比较简单
+
+                }
+                set_current_playing(0);//添加文件后重置当前播放项
+
+                lvFileList.EndUpdate();
+                this.Enabled = true;
+
+                processBar.Visible = false;
+                return (total_amount, succeed_amount);
+            }
+            else
+            {
+                return (0, 0);
+            }
+            
+        }
+
+        private void save_to_json(string path)
+        {
+            System.Windows.Forms.TextBox[] folder_paths = { txtboxSortFolder1, txtboxSortFolder2, txtboxSortFolder3, txtboxSortFolder4, txtboxSortFolder5 };
+            ProjectData projectData = new ProjectData();
+            projectData.Labels = new Dictionary<int, string>();
+            projectData.Files = new List<ProjectFileData>();
+            for (int i = 1; i <= 5; i++)
+            {
+                projectData.Labels.Add(i, folder_paths[i - 1].Text);
+            }
+            foreach (ListViewItem item in lvFileList.Items)
+            {
+                ProjectFileData projectFileData = new ProjectFileData();
+                projectFileData.Filepath = item.SubItems[4].Text;
+                projectFileData.Label = item.SubItems[1].Text == string.Empty ? 0 : int.Parse(item.SubItems[1].Text);
+                projectFileData.Similarity = item.SubItems[5].Text == string.Empty ? 0 : float.Parse(item.SubItems[5].Text);
+                projectData.Files.Add(projectFileData);
+            }
+            string json = JsonConvert.SerializeObject(projectData, Formatting.Indented);
+            try
+            {
+                File.WriteAllText(path, json);
+                MessageBox.Show("保存成功", "提示", MessageBoxButtons.OK);
+            }
+            catch
+            {
+                MessageBox.Show("保存失败\n请检查您是否拥有文件的访问权限，或文件是否被占用", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
         private (int,int) apply_actions<T>(T items) where T : ICollection //应用动作标记
         {
@@ -227,6 +341,7 @@ namespace audio_dataset_screener
                         break;
                 }
                 processBar.PerformStep();
+                Application.DoEvents();
                 
             }
             processBar.Visible = false;
@@ -280,10 +395,26 @@ namespace audio_dataset_screener
         }
         private void toolStripMenuItemOpenProject_Click(object sender, EventArgs e) //从json导入工程
         {
-
+            OpenFileDialog openFileDialogProject = new OpenFileDialog();
+            openFileDialogProject.Filter = "工程文件（*.json）|*.json;";
+            openFileDialogProject.Title = "打开工程";
+            if (openFileDialogProject.ShowDialog() == DialogResult.OK)
+            {
+                string json = File.ReadAllText(openFileDialogProject.FileName);
+                clear_filelist();
+                load_files_from_json(json);
+            }
         }
         private void toolStripMenuItemSaveProject_Click(object sender, EventArgs e) //保存当前工程为json
         {
+            wmp_pause();
+            SaveFileDialog saveFileDialogProject = new SaveFileDialog();
+            saveFileDialogProject.DefaultExt = "json";
+            saveFileDialogProject.Filter = "工程文件(*.json)|*.json";
+            if(saveFileDialogProject.ShowDialog() == DialogResult.OK)
+            {
+                save_to_json(saveFileDialogProject.FileName);
+            }
 
         }
         private void btnRemoveSelected_Click(object sender, EventArgs e) //移除选中项
@@ -354,9 +485,7 @@ namespace audio_dataset_screener
         }
         private void btnClearList_Click(object sender, EventArgs e) //清空列表
         {
-            lvFileList.Items.Clear();
-            wmp_stop();
-            set_current_playing(0);
+            clear_filelist();
         }
 
         private void lvFileList_MouseDoubleClick(object sender, MouseEventArgs e) //文件列表双击播放
@@ -583,12 +712,24 @@ namespace audio_dataset_screener
         }
         private void btnReplace_Click(object sender, EventArgs e)
         {
-            foreach (ListViewItem item in lvFileList.Items)
+            if(comboReplaceOri.SelectedIndex != -1 & comboReplaceDes.SelectedIndex != -1)
             {
-                if(item.SubItems[1].Text == comboReplaceOri.Text)
+                if(comboReplaceDes.SelectedIndex < 5)
                 {
-                    item.SubItems[1].Text = comboReplaceDes.Text;
+                    System.Windows.Forms.TextBox[] folder_paths = { txtboxSortFolder1, txtboxSortFolder2, txtboxSortFolder3, txtboxSortFolder4, txtboxSortFolder5 };
+                    if (folder_paths[comboReplaceDes.SelectedIndex].Text == string.Empty)
+                    {
+                        return;
+                    }
                 }
+                foreach (ListViewItem item in lvFileList.Items)
+                {
+                    if (item.SubItems[1].Text == comboReplaceOri.Text)
+                    {
+                        item.SubItems[1].Text = comboReplaceDes.Text;
+                    }
+                }
+
             }
         }
         private void btnCancelSelectedActions_Click(object sender, EventArgs e)
