@@ -13,7 +13,10 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ToolBar;
 
 namespace audio_dataset_screener
 {
@@ -132,6 +135,54 @@ namespace audio_dataset_screener
                 wmp_next();
             }
         }
+
+        private (int, int) load_files(string[] paths)
+        {
+            List<string> existed_paths_in_filelist = new List<string>();
+            foreach (ListViewItem item in lvFileList.Items)
+            {
+                existed_paths_in_filelist.Add(item.SubItems[4].Text);
+            }//获取当前列表中的所有文件路径
+
+            int total_amount = paths.Length;
+            int succeed_amount = 0;
+
+            //设置进度条
+            processBar.Maximum = total_amount;
+            processBar.Value = 0;
+            processBar.Visible = true;
+
+            lvFileList.BeginUpdate();
+
+            foreach (string path in paths)
+            {
+                try
+                {
+                    SoundInfo soundinfo = new SoundInfo(path);
+                    if (soundinfo.Duration != string.Empty & !existed_paths_in_filelist.Contains(soundinfo.FilePath))//如果无法读取时长，则认为不是受支持的音频文件，或如果列表中已存在相同路径的文件，都不予添加
+                    {
+                        ListViewItem lvItem = new ListViewItem();
+                        lvItem.SubItems[0].Text = string.Empty;
+                        lvItem.SubItems.Add(string.Empty);
+                        lvItem.SubItems.Add(soundinfo.FileName);
+                        lvItem.SubItems.Add(soundinfo.Duration);
+                        lvItem.SubItems.Add(soundinfo.FilePath);
+                        lvFileList.Items.Add(lvItem);
+                        succeed_amount++;
+                    }
+                }
+                catch { }
+                processBar.PerformStep();
+
+            }
+            set_current_playing(0);//添加文件后重置当前播放项
+
+            lvFileList.EndUpdate();
+            processBar.Visible = false;
+            return (total_amount, succeed_amount);
+        }
+
+
         private (int,int) apply_actions<T>(T items) where T : ICollection //应用动作标记
         {
             System.Windows.Forms.TextBox[] folder_paths = { txtboxSortFolder1, txtboxSortFolder2, txtboxSortFolder3, txtboxSortFolder4, txtboxSortFolder5 };
@@ -185,118 +236,41 @@ namespace audio_dataset_screener
         #endregion
 
         #region 文件列表处理逻辑
-        private void btnAddFile_Click(object sender, EventArgs e) //添加文件
+        private void btnAdd_Click(object sender, EventArgs e)
+        {
+            ctMenuAdd.Show(btnAdd, 0, btnAdd.Height);
+        }
+        private void btnProject_Click(object sender, EventArgs e)
+        {
+            ctMenuProject.Show(btnProject, 0, btnProject.Height);
+        }
+        
+        private void toolStripMenuItemAddFile_Click(object sender, EventArgs e)
         {
             wmp_stop();
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                lvFileList.BeginUpdate();
-
                 string[] paths = openFileDialog.FileNames;
 
-                List<string> existed_paths_in_filelist = new List<string>();
-                foreach (ListViewItem item in lvFileList.Items) 
-                {
-                    existed_paths_in_filelist.Add(item.SubItems[4].Text);
-                }//获取当前列表中的所有文件路径
-
-                int total_amount = paths.Length;
-                int succeed_amount = 0;
-
-                processBar.Maximum = total_amount;
-                processBar.Value = 0;
-                processBar.Visible = true;
-                
-
-                foreach (string path in paths)
-                {
-                    try
-                    {
-                        SoundInfo soundinfo = new SoundInfo(path);
-                        if (soundinfo.Duration != string.Empty & !existed_paths_in_filelist.Contains(soundinfo.FilePath))//如果无法读取时长，则认为不是受支持的音频文件，或如果列表中已存在相同路径的文件，都不予添加
-                        {
-                            ListViewItem lvItem = new ListViewItem();
-                            lvItem.SubItems[0].Text = string.Empty;
-                            lvItem.SubItems.Add(string.Empty);
-                            lvItem.SubItems.Add(soundinfo.FileName);
-                            lvItem.SubItems.Add(soundinfo.Duration);
-                            lvItem.SubItems.Add(soundinfo.FilePath);
-                            lvFileList.Items.Add(lvItem);
-                            succeed_amount++;
-                        }
-                    }
-                    catch { }
-                    processBar.PerformStep();
-                    
-                }
-                set_current_playing(0);//添加文件后重置当前播放项
-
-                processBar.Visible = false;
-
-                lvFileList.EndUpdate();
+                (int total_amount, int succeed_amount) = load_files(paths);//加载文件
 
                 if (total_amount - succeed_amount > 0)
                 {
                     MessageBox.Show($"已成功添加{succeed_amount.ToString()}个文件，但失败{(total_amount - succeed_amount).ToString()}个\n可能是因为您选择了列表中已存在的文件或非音频文件", "存在错误", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
-                
+
             }
         }
 
-
-        private void btnAddFolder_Click(object sender, EventArgs e) //添加目录
+        private void toolStripMenuItemAddFolder_Click(object sender, EventArgs e)
         {
             wmp_stop();
             if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
             {
-                lvFileList.BeginUpdate();
 
-                DirectoryInfo dir = new DirectoryInfo(folderBrowserDialog.SelectedPath);
-                FileInfo[] file = dir.GetFiles();
+                string[] paths = Directory.GetFiles(folderBrowserDialog.SelectedPath);
 
-                List<string> existed_paths_in_filelist = new List<string>();
-
-                foreach (ListViewItem item in lvFileList.Items) //获取当前列表中的所有文件路径
-                {
-                    existed_paths_in_filelist.Add(item.SubItems[4].Text);
-                }
-
-                int total_amount = file.Length;
-                int succeed_amount = 0;
-
-                processBar.Maximum = total_amount;
-                processBar.Value = 0;
-                processBar.Visible = true;
-                
-
-
-                foreach (FileInfo f in file)
-                {
-                    try
-                    {
-                        SoundInfo soundinfo = new SoundInfo(f.FullName);
-                        if (soundinfo.Duration != string.Empty & !existed_paths_in_filelist.Contains(soundinfo.FilePath))
-                        {
-                            ListViewItem lvItem = new ListViewItem();
-                            lvItem.SubItems[0].Text = string.Empty;
-                            lvItem.SubItems.Add(string.Empty);
-                            lvItem.SubItems.Add(soundinfo.FileName);
-                            lvItem.SubItems.Add(soundinfo.Duration);
-                            lvItem.SubItems.Add(soundinfo.FilePath);
-                            lvFileList.Items.Add(lvItem);
-                            succeed_amount++;
-                        }
-                    }
-                    catch { }
-                    processBar.PerformStep();
-                    
-                }
-
-                set_current_playing(0);//添加文件后重置当前播放
-
-                processBar.Visible = false;
-
-                lvFileList.EndUpdate();
+                (int total_amount, int succeed_amount) = load_files(paths);//加载文件
 
                 if (total_amount - succeed_amount > 0)
                 {
@@ -304,7 +278,14 @@ namespace audio_dataset_screener
                 }
             }
         }
+        private void toolStripMenuItemOpenProject_Click(object sender, EventArgs e) //从json导入工程
+        {
 
+        }
+        private void toolStripMenuItemSaveProject_Click(object sender, EventArgs e) //保存当前工程为json
+        {
+
+        }
         private void btnRemoveSelected_Click(object sender, EventArgs e) //移除选中项
         {
             if (lvFileList.SelectedItems.Count > 0)
@@ -313,18 +294,10 @@ namespace audio_dataset_screener
                 wmp_stop();
                 int last_selected_index = lvFileList.SelectedItems[lvFileList.SelectedItems.Count - 1].Index;
 
-                processBar.Maximum = lvFileList.SelectedItems.Count;
-                processBar.Value = 0;
-                processBar.Visible = true;
-                
-
                 foreach (ListViewItem item in lvFileList.SelectedItems)
                 {
                     item.Remove();
-                    processBar.PerformStep();
-                    
                 }
-
                 try
                 {
                     set_current_playing(last_selected_index);//尝试将当前播放设为删除项之后的第一项
@@ -333,11 +306,7 @@ namespace audio_dataset_screener
                 {
                     set_current_playing(lvFileList.Items.Count == 0 ? 0 : lvFileList.Items.Count - 1);//如果不成功，若文件列表已空，则重置，不为空则设为最后一项
                 }
-
-                processBar.Visible = false;
-
                 lvFileList.EndUpdate();
-
             }
         }
         private void btnDeleteSelected_Click(object sender, EventArgs e) //删除选中项
@@ -348,17 +317,13 @@ namespace audio_dataset_screener
                 {
                     return;
                 }
+
                 lvFileList.BeginUpdate();
                 wmp_stop();
 
                 int total_amount = lvFileList.SelectedItems.Count;
                 int succeed_amount = 0;
                 int last_selected_index = lvFileList.SelectedItems[total_amount - 1].Index;
-
-                processBar.Maximum = lvFileList.SelectedItems.Count;
-                processBar.Value = 0;
-                processBar.Visible = true;
-                
 
                 foreach (ListViewItem item in lvFileList.SelectedItems)
                 {
@@ -369,11 +334,7 @@ namespace audio_dataset_screener
                         succeed_amount++;
                     }
                     catch { }
-                    processBar.PerformStep();
-                    
                 }
-
-                processBar.Visible = false;
 
                 lvFileList.EndUpdate();
 
@@ -620,6 +581,16 @@ namespace audio_dataset_screener
         {
             set_move_action_for_current_playing(4);
         }
+        private void btnReplace_Click(object sender, EventArgs e)
+        {
+            foreach (ListViewItem item in lvFileList.Items)
+            {
+                if(item.SubItems[1].Text == comboReplaceOri.Text)
+                {
+                    item.SubItems[1].Text = comboReplaceDes.Text;
+                }
+            }
+        }
         private void btnCancelSelectedActions_Click(object sender, EventArgs e)
         {
             if (lvFileList.SelectedItems.Count > 0)
@@ -706,6 +677,9 @@ namespace audio_dataset_screener
                     case Keys.S:
                         btnNext_Click(null, null);
                         break;
+                    case Keys.R:
+                        btnCancelSelectedActions_Click(null, null);
+                        break;
                     case Keys.Delete:
                         btnDelete_Click(null, null);
                         break;
@@ -781,5 +755,7 @@ namespace audio_dataset_screener
         {
             System.Diagnostics.Process.Start("https://github.com/2DIPW/audio_dataset_screener");
         }
+
+
     }
 }
