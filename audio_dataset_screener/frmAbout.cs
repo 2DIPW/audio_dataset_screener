@@ -34,7 +34,7 @@ namespace audio_dataset_screener
 
         private void linkLabelBilibili_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-
+            System.Diagnostics.Process.Start("https://space.bilibili.com/1823254607");
         }
     }
 }

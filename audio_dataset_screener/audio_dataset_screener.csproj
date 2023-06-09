@@ -162,6 +162,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="audio_screener.ico" />
+    <None Include="Resources\logo.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

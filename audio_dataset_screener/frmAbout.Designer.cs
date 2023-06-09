@@ -31,9 +31,9 @@
             this.labelAbout = new System.Windows.Forms.Label();
             this.linkLabelGithub = new System.Windows.Forms.LinkLabel();
             this.btnClose = new System.Windows.Forms.Button();
-            this.pictureBoxLogo = new System.Windows.Forms.PictureBox();
             this.linkLabelHuggingFace = new System.Windows.Forms.LinkLabel();
             this.linkLabelBilibili = new System.Windows.Forms.LinkLabel();
+            this.pictureBoxLogo = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxLogo)).BeginInit();
             this.SuspendLayout();
             // 
@@ -41,27 +41,29 @@
             // 
             this.labelAbout.AutoSize = true;
             this.labelAbout.Font = new System.Drawing.Font("Arial", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelAbout.Location = new System.Drawing.Point(84, 11);
+            this.labelAbout.Location = new System.Drawing.Point(84, 12);
             this.labelAbout.Name = "labelAbout";
             this.labelAbout.Size = new System.Drawing.Size(315, 80);
             this.labelAbout.TabIndex = 1;
-            this.labelAbout.Text = "Audio Dataset Screener\r\nVersion 1.3.0\r\nby 2DIPW\r\nLicensed under GNU General Publi" +
-    "c License v3\r\nOpen source leads the world to a brighter future!";
+            this.labelAbout.Text = "Audio Dataset Screener\r\nVersion 1.3.0\r\nDeveloped by 2DIPW\r\nLicensed under GNU Gen" +
+    "eral Public License v3\r\nOpen source leads the world to a brighter future!";
             // 
             // linkLabelGithub
             // 
             this.linkLabelGithub.AutoSize = true;
+            this.linkLabelGithub.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.linkLabelGithub.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline;
-            this.linkLabelGithub.Location = new System.Drawing.Point(85, 106);
+            this.linkLabelGithub.Location = new System.Drawing.Point(84, 106);
             this.linkLabelGithub.Name = "linkLabelGithub";
-            this.linkLabelGithub.Size = new System.Drawing.Size(41, 12);
+            this.linkLabelGithub.Size = new System.Drawing.Size(45, 15);
             this.linkLabelGithub.TabIndex = 2;
+            this.linkLabelGithub.TabStop = true;
             this.linkLabelGithub.Text = "GitHub";
             this.linkLabelGithub.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelGithub_LinkClicked);
             // 
             // btnClose
             // 
-            this.btnClose.Location = new System.Drawing.Point(321, 101);
+            this.btnClose.Location = new System.Drawing.Point(322, 102);
             this.btnClose.Name = "btnClose";
             this.btnClose.Size = new System.Drawing.Size(75, 23);
             this.btnClose.TabIndex = 4;
@@ -69,35 +71,40 @@
             this.btnClose.UseVisualStyleBackColor = true;
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
-            // pictureBoxLogo
-            // 
-            this.pictureBoxLogo.Location = new System.Drawing.Point(12, 11);
-            this.pictureBoxLogo.Name = "pictureBoxLogo";
-            this.pictureBoxLogo.Size = new System.Drawing.Size(63, 59);
-            this.pictureBoxLogo.TabIndex = 5;
-            this.pictureBoxLogo.TabStop = false;
-            // 
             // linkLabelHuggingFace
             // 
             this.linkLabelHuggingFace.AutoSize = true;
+            this.linkLabelHuggingFace.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.linkLabelHuggingFace.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline;
-            this.linkLabelHuggingFace.Location = new System.Drawing.Point(132, 106);
+            this.linkLabelHuggingFace.Location = new System.Drawing.Point(140, 106);
             this.linkLabelHuggingFace.Name = "linkLabelHuggingFace";
-            this.linkLabelHuggingFace.Size = new System.Drawing.Size(71, 12);
+            this.linkLabelHuggingFace.Size = new System.Drawing.Size(81, 15);
             this.linkLabelHuggingFace.TabIndex = 2;
+            this.linkLabelHuggingFace.TabStop = true;
             this.linkLabelHuggingFace.Text = "HuggingFace";
             this.linkLabelHuggingFace.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelHuggingFace_LinkClicked);
             // 
             // linkLabelBilibili
             // 
             this.linkLabelBilibili.AutoSize = true;
+            this.linkLabelBilibili.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.linkLabelBilibili.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline;
-            this.linkLabelBilibili.Location = new System.Drawing.Point(209, 106);
+            this.linkLabelBilibili.Location = new System.Drawing.Point(232, 106);
             this.linkLabelBilibili.Name = "linkLabelBilibili";
-            this.linkLabelBilibili.Size = new System.Drawing.Size(53, 12);
+            this.linkLabelBilibili.Size = new System.Drawing.Size(40, 15);
             this.linkLabelBilibili.TabIndex = 2;
+            this.linkLabelBilibili.TabStop = true;
             this.linkLabelBilibili.Text = "Bilibili";
             this.linkLabelBilibili.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelBilibili_LinkClicked);
+            // 
+            // pictureBoxLogo
+            // 
+            this.pictureBoxLogo.Image = global::audio_dataset_screener.Properties.Resources.logo;
+            this.pictureBoxLogo.Location = new System.Drawing.Point(12, 12);
+            this.pictureBoxLogo.Name = "pictureBoxLogo";
+            this.pictureBoxLogo.Size = new System.Drawing.Size(64, 64);
+            this.pictureBoxLogo.TabIndex = 5;
+            this.pictureBoxLogo.TabStop = false;
             // 
             // frmAbout
             // 
@@ -116,7 +123,6 @@
             this.Name = "frmAbout";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
-            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "关于";
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxLogo)).EndInit();

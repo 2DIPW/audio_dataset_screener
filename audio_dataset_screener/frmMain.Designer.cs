@@ -40,10 +40,10 @@
             this.toolStripMenuItemOpenProject = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItemSaveProject = new System.Windows.Forms.ToolStripMenuItem();
             this.btnAdd = new System.Windows.Forms.Button();
+            this.lvFileList = new DoubleBufferedListView();
             this.ctMenuAdd = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItemAddFile = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItemAddFolder = new System.Windows.Forms.ToolStripMenuItem();
-            this.lvFileList = new DoubleBufferedListView();
             this.chPlaying = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.chAction = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.chName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -871,7 +871,7 @@
             this.btnApplyAllActions.Name = "btnApplyAllActions";
             this.btnApplyAllActions.Size = new System.Drawing.Size(288, 36);
             this.btnApplyAllActions.TabIndex = 4;
-            this.btnApplyAllActions.Text = "执行所有";
+            this.btnApplyAllActions.Text = "全部执行";
             this.btnApplyAllActions.UseVisualStyleBackColor = true;
             this.btnApplyAllActions.Click += new System.EventHandler(this.btnApplyAllActions_Click);
             // 
@@ -923,7 +923,7 @@
             this.btnCancelAllActions.Name = "btnCancelAllActions";
             this.btnCancelAllActions.Size = new System.Drawing.Size(92, 23);
             this.btnCancelAllActions.TabIndex = 4;
-            this.btnCancelAllActions.Text = "取消所有";
+            this.btnCancelAllActions.Text = "全部取消";
             this.btnCancelAllActions.UseVisualStyleBackColor = true;
             this.btnCancelAllActions.Click += new System.EventHandler(this.btnCancelAllActions_Click);
             // 

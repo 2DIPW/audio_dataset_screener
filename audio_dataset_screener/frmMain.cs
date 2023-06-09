@@ -213,6 +213,8 @@ namespace audio_dataset_screener
                 return (0, 0);
             }
 
+            clear_filelist();
+
             List<string> existed_paths_in_filelist = new List<string>();
             foreach (ListViewItem item in lvFileList.Items)
             {
@@ -243,8 +245,6 @@ namespace audio_dataset_screener
                 processBar.Maximum = total_amount;
                 processBar.Value = 0;
                 processBar.Visible = true;
-
-                clear_filelist();
 
                 lvFileList.BeginUpdate();
                 this.Enabled = false;
@@ -372,7 +372,7 @@ namespace audio_dataset_screener
         }
         #endregion
 
-        #region 文件列表处理逻辑
+        #region 文件列表处理
         private void btnAdd_Click(object sender, EventArgs e)
         {
             ctMenuAdd.Show(btnAdd, 0, btnAdd.Height);
@@ -424,6 +424,10 @@ namespace audio_dataset_screener
                     if (MessageBox.Show("还有未应用的筛选动作，打开工程会清空当前文件列表，确实要继续吗", "提示", MessageBoxButtons.YesNo,MessageBoxIcon.Question) != DialogResult.Yes)
                     {
                         return;
+                    }
+                    else
+                    {
+                        break;
                     }
                 }
 
@@ -551,7 +555,7 @@ namespace audio_dataset_screener
         }
         #endregion
 
-        #region 播放控制逻辑
+        #region 播放控制
         private void btnPlayPause_Click(object sender, EventArgs e) //播放暂停键
         {
             if(wmp.playState.ToString()== "wmppsPlaying" | wmp.playState.ToString() == "wmppsScanForward")//有时wmp会自作聪明地把正在倍速播放的文件设为wmppsScanForward状态，麻了
@@ -671,7 +675,7 @@ namespace audio_dataset_screener
 
         #endregion
 
-        #region 分类筛选逻辑
+        #region 分类筛选
         private void btnSortFolder1_Click(object sender, EventArgs e)
         {
             if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
@@ -829,6 +833,7 @@ namespace audio_dataset_screener
         }
         #endregion
 
+        #region 其他
         private void frmMain_KeyDown(object sender, KeyEventArgs e) //定义窗体热键
         {
             if (grpPlaycontrol.Enabled & grpAction.Enabled)
@@ -929,7 +934,7 @@ namespace audio_dataset_screener
             frmAbout frmAbout = new frmAbout();
             frmAbout.ShowDialog();
         }
-
+        #endregion
 
     }
 }
