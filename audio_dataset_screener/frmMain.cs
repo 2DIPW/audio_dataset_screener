@@ -438,7 +438,11 @@ namespace audio_dataset_screener
             if (openFileDialogProject.ShowDialog() == DialogResult.OK)
             {
                 string json = File.ReadAllText(openFileDialogProject.FileName);
-                load_files_from_json(json);
+                (int total_amount, int succeed_amount) = load_files_from_json(json);
+                if (total_amount - succeed_amount > 0)
+                {
+                    MessageBox.Show($"已成功添加{succeed_amount.ToString()}个文件，但失败{(total_amount - succeed_amount).ToString()}个\n可能是因为自该工程保存后部分文件已被移动或删除", "存在错误", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
         }
         private void toolStripMenuItemSaveProject_Click(object sender, EventArgs e) //保存当前工程为json

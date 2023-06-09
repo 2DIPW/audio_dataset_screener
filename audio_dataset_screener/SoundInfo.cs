@@ -20,7 +20,14 @@ namespace audio_dataset_screener
 
         public SoundInfo(string filePath) 
         {
-            getSoundInfo(filePath);
+            if (File.Exists(filePath))
+            {
+                getSoundInfo(filePath);
+            }
+            else
+            {
+                duration = string.Empty;
+            }
         }
 
         public Shell32.Folder GetShell32NameSpaceFolder(Object folder) 
