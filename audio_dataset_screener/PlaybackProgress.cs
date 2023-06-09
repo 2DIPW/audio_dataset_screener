@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace audio_dataset_screener
 {
-    internal class PlaybackProgress
+    internal class PlaybackProgress //封装WMP的播放进度控制功能，使其更加易用
     {
         private AxWMPLib.AxWindowsMediaPlayer WMP;
         public int Duration { get { return (int)(WMP.currentMedia.duration * 1000); } }

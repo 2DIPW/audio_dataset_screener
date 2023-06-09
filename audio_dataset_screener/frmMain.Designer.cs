@@ -43,7 +43,7 @@
             this.ctMenuAdd = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItemAddFile = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItemAddFolder = new System.Windows.Forms.ToolStripMenuItem();
-            this.lvFileList = new System.Windows.Forms.ListView();
+            this.lvFileList = new DoubleBufferedListView();
             this.chPlaying = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.chAction = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.chName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -160,6 +160,7 @@
             this.btnClearList.TabIndex = 1;
             this.btnClearList.TabStop = false;
             this.btnClearList.Text = "清空列表";
+            this.tip.SetToolTip(this.btnClearList, "清空当前文件列表（不影响本地文件）");
             this.btnClearList.UseVisualStyleBackColor = true;
             this.btnClearList.Click += new System.EventHandler(this.btnClearList_Click);
             // 
@@ -200,6 +201,7 @@
             this.btnProject.TabIndex = 1;
             this.btnProject.TabStop = false;
             this.btnProject.Text = "工程文件";
+            this.tip.SetToolTip(this.btnProject, "将当前会话状态保存为工程文件，或从工程文件恢复会话");
             this.btnProject.UseVisualStyleBackColor = true;
             this.btnProject.Click += new System.EventHandler(this.btnProject_Click);
             // 
@@ -235,6 +237,7 @@
             this.btnAdd.TabIndex = 0;
             this.btnAdd.TabStop = false;
             this.btnAdd.Text = "添加项目";
+            this.tip.SetToolTip(this.btnAdd, "向文件列表中添加音频文件");
             this.btnAdd.UseVisualStyleBackColor = true;
             this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
             // 
@@ -394,6 +397,7 @@
             this.btnSortFolder5.TabIndex = 10;
             this.btnSortFolder5.TabStop = false;
             this.btnSortFolder5.Text = "...";
+            this.tip.SetToolTip(this.btnSortFolder5, "浏览");
             this.btnSortFolder5.UseVisualStyleBackColor = true;
             this.btnSortFolder5.Click += new System.EventHandler(this.btnSortFolder5_Click);
             // 
@@ -421,6 +425,7 @@
             this.btnSortFolder4.TabIndex = 10;
             this.btnSortFolder4.TabStop = false;
             this.btnSortFolder4.Text = "...";
+            this.tip.SetToolTip(this.btnSortFolder4, "浏览");
             this.btnSortFolder4.UseVisualStyleBackColor = true;
             this.btnSortFolder4.Click += new System.EventHandler(this.btnSortFolder4_Click);
             // 
@@ -432,6 +437,7 @@
             this.btnSortFolder3.TabIndex = 10;
             this.btnSortFolder3.TabStop = false;
             this.btnSortFolder3.Text = "...";
+            this.tip.SetToolTip(this.btnSortFolder3, "浏览");
             this.btnSortFolder3.UseVisualStyleBackColor = true;
             this.btnSortFolder3.Click += new System.EventHandler(this.btnSortFolder3_Click);
             // 
@@ -443,6 +449,7 @@
             this.btnSortFolder2.TabIndex = 10;
             this.btnSortFolder2.TabStop = false;
             this.btnSortFolder2.Text = "...";
+            this.tip.SetToolTip(this.btnSortFolder2, "浏览");
             this.btnSortFolder2.UseVisualStyleBackColor = true;
             this.btnSortFolder2.Click += new System.EventHandler(this.btnSortFolder2_Click);
             // 
@@ -454,6 +461,7 @@
             this.btnSortFolder1.TabIndex = 10;
             this.btnSortFolder1.TabStop = false;
             this.btnSortFolder1.Text = "...";
+            this.tip.SetToolTip(this.btnSortFolder1, "浏览");
             this.btnSortFolder1.UseVisualStyleBackColor = true;
             this.btnSortFolder1.Click += new System.EventHandler(this.btnSortFolder1_Click);
             // 
@@ -1006,7 +1014,7 @@
         private System.Windows.Forms.Button btnRemoveSelected;
         private System.Windows.Forms.Button btnProject;
         private System.Windows.Forms.Button btnAdd;
-        private System.Windows.Forms.ListView lvFileList;
+        private DoubleBufferedListView lvFileList;
         private System.Windows.Forms.Label labelSortFolder4;
         private System.Windows.Forms.Label labelSortFolder3;
         private System.Windows.Forms.Label labelSortFolder2;

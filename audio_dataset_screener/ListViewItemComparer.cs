@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace audio_dataset_screener
 {
-    internal class ListViewItemComparer : IComparer
+    internal class ListViewItemComparer : IComparer //文件列表点击表头排序功能
     {
         private int col;
         private SortOrder order;

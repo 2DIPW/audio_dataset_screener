@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace audio_dataset_screener
 {
-    internal class SoundInfo
+    internal class SoundInfo //读取音频文件时长
     {
         private string fileName;
         private string filePath;

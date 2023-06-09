@@ -51,11 +51,14 @@ namespace audio_dataset_screener
             }
             else
             {
+                lvFileList.BeginUpdate();
                 foreach (ListViewItem item in lvFileList.Items)//重置所有列表项的播放标记和选中情况
                 {
                     item.SubItems[0].Text = "";
                     item.Selected = false;
                 }
+                lvFileList.EndUpdate();
+
                 lvFileList.Items[index].SubItems[0].Text = "▶"; //在当前播放项前加上标记符号
                 lvFileList.Items[index].Selected = true;//选中当前播放项
                 lvFileList.EnsureVisible(index);//滚动到当前播放项
@@ -193,27 +196,44 @@ namespace audio_dataset_screener
         }
         private (int, int) load_files_from_json(string json)
         {
+            ProjectData projectData = null;
+            try
+            {
+                projectData = JsonConvert.DeserializeObject<ProjectData>(json);
+            }
+            catch
+            {
+                MessageBox.Show("载入工程文件出错", "错误", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return (0, 0);
+            }
+
+            if (projectData == null)
+            {
+                MessageBox.Show("工程文件为空", "错误", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return (0, 0);
+            }
+
             List<string> existed_paths_in_filelist = new List<string>();
             foreach (ListViewItem item in lvFileList.Items)
             {
                 existed_paths_in_filelist.Add(item.SubItems[4].Text);
             }//获取当前列表中的所有文件路径
 
-            ProjectData projectData = JsonConvert.DeserializeObject<ProjectData>(json);
-
-            if (projectData.Labels.Count > 5)
+            if(projectData.Labels != null)
             {
-                MessageBox.Show("工程文件中包含5个以上的分类，序号大于5的分类将被忽略！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            if (projectData.Labels.Count > 0)
-            {
-                System.Windows.Forms.TextBox[] folder_paths = { txtboxSortFolder1, txtboxSortFolder2, txtboxSortFolder3, txtboxSortFolder4, txtboxSortFolder5 };
-                for (int i = 1; i <= 5; i++)
+                if (projectData.Labels.Count > 5)
                 {
-                    folder_paths[i - 1].Text = projectData.Labels[i];
+                    MessageBox.Show("工程文件中包含5个以上的分类，序号大于5的分类将被忽略", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                if (projectData.Labels.Count > 0)
+                {
+                    System.Windows.Forms.TextBox[] folder_paths = { txtboxSortFolder1, txtboxSortFolder2, txtboxSortFolder3, txtboxSortFolder4, txtboxSortFolder5 };
+                    for (int i = 1; i <= 5; i++)
+                    {
+                        folder_paths[i - 1].Text = projectData.Labels[i];
+                    }
                 }
             }
-
             if(projectData.Files != null)
             {
                 int total_amount = projectData.Files.Count;
@@ -223,6 +243,8 @@ namespace audio_dataset_screener
                 processBar.Maximum = total_amount;
                 processBar.Value = 0;
                 processBar.Visible = true;
+
+                clear_filelist();
 
                 lvFileList.BeginUpdate();
                 this.Enabled = false;
@@ -395,13 +417,23 @@ namespace audio_dataset_screener
         }
         private void toolStripMenuItemOpenProject_Click(object sender, EventArgs e) //从json导入工程
         {
+            foreach (ListViewItem item in lvFileList.Items)//判断是否还有未应用的动作
+            {
+                if (item.SubItems[1].Text != string.Empty)
+                {
+                    if (MessageBox.Show("还有未应用的筛选动作，打开工程会清空当前文件列表，确实要继续吗", "提示", MessageBoxButtons.YesNo,MessageBoxIcon.Question) != DialogResult.Yes)
+                    {
+                        return;
+                    }
+                }
+
+            }
             OpenFileDialog openFileDialogProject = new OpenFileDialog();
             openFileDialogProject.Filter = "工程文件（*.json）|*.json;";
             openFileDialogProject.Title = "打开工程";
             if (openFileDialogProject.ShowDialog() == DialogResult.OK)
             {
                 string json = File.ReadAllText(openFileDialogProject.FileName);
-                clear_filelist();
                 load_files_from_json(json);
             }
         }
@@ -545,7 +577,7 @@ namespace audio_dataset_screener
 
         private void btnRew_Click(object sender, EventArgs e) //快退
         {
-            if (wmp.playState.ToString() == "wmppsPlaying" | wmp.playState.ToString() == "wmppsScanForward")
+            if (wmp.playState.ToString() == "wmppsPlaying" | wmp.playState.ToString() == "wmppsScanForward") //只有在播放状态才予以响应
             {
                 int position = playbackProgress.CurrentPosition - (int)numericStep.Value * 1000;
                 playbackProgress.CurrentPosition = position <= 0 ? 0 : position;//如果快退后播放位置<=0，则直接设为0
@@ -553,10 +585,10 @@ namespace audio_dataset_screener
         }
         private void btnFF_Click(object sender, EventArgs e) //快进
         {
-            if (wmp.playState.ToString() == "wmppsPlaying" | wmp.playState.ToString() == "wmppsScanForward")
+            if (wmp.playState.ToString() == "wmppsPlaying" | wmp.playState.ToString() == "wmppsScanForward") //只有在播放状态才予以响应
             {
                 int position = playbackProgress.CurrentPosition + (int)numericStep.Value * 1000;
-                if (position >= playbackProgress.Duration)
+                if (position >= playbackProgress.Duration) //如果快进后播放位置>=总长度
                 {
                     if (chkListAuto.Checked)
                     {
@@ -585,7 +617,7 @@ namespace audio_dataset_screener
         }
         private void wmp_PlayStateChange(object sender, AxWMPLib._WMPOCXEvents_PlayStateChangeEvent e) //播放完毕事件
         {
-            if (wmp.playState.ToString() == "wmppsMediaEnded")
+            if (wmp.playState.ToString() == "wmppsMediaEnded") //如果当前状态为播放完毕
             {
                 if (chkListAuto.Checked)
                 {
@@ -712,17 +744,17 @@ namespace audio_dataset_screener
         }
         private void btnReplace_Click(object sender, EventArgs e)
         {
-            if(comboReplaceOri.SelectedIndex != -1 & comboReplaceDes.SelectedIndex != -1)
+            if(comboReplaceOri.SelectedIndex != -1 & comboReplaceDes.SelectedIndex != -1)//如果两个combobox都有选择
             {
-                if(comboReplaceDes.SelectedIndex < 5)
+                if(comboReplaceDes.SelectedIndex < 5) //如果替换为分类标记
                 {
                     System.Windows.Forms.TextBox[] folder_paths = { txtboxSortFolder1, txtboxSortFolder2, txtboxSortFolder3, txtboxSortFolder4, txtboxSortFolder5 };
-                    if (folder_paths[comboReplaceDes.SelectedIndex].Text == string.Empty)
+                    if (folder_paths[comboReplaceDes.SelectedIndex].Text == string.Empty) //如果该分类标记未指定目录，则不响应
                     {
                         return;
                     }
                 }
-                foreach (ListViewItem item in lvFileList.Items)
+                foreach (ListViewItem item in lvFileList.Items) //开始替换
                 {
                     if (item.SubItems[1].Text == comboReplaceOri.Text)
                     {
@@ -745,7 +777,7 @@ namespace audio_dataset_screener
 
         private void btnCancelAllActions_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show("确实要取消所有的筛选动作吗？该操作不可撤销！", "确认", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            if (MessageBox.Show("确实要取消所有的筛选动作吗？该操作不可撤销", "确认", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
             {
                 return;
             }
@@ -759,7 +791,7 @@ namespace audio_dataset_screener
         {
             if (lvFileList.SelectedItems.Count > 0)
             {
-                if (MessageBox.Show("确实要应用所选的筛选动作吗？该操作不可撤销！", "确认", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                if (MessageBox.Show("确实要执行所选的筛选动作吗？该操作不可撤销", "确认", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                 {
                     return;
                 }
@@ -777,7 +809,7 @@ namespace audio_dataset_screener
 
         private void btnApplyAllActions_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show("确实要应用所有的筛选动作吗？该操作不可撤销！", "确认", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            if (MessageBox.Show("确实要执行所有的筛选动作吗？该操作不可撤销", "确认", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
             {
                 return;
             }
@@ -791,7 +823,7 @@ namespace audio_dataset_screener
             }
             else
             {
-                MessageBox.Show($"已成功应用所有动作！", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show($"已成功执行所有动作", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             set_current_playing(0);
         }
@@ -877,7 +909,7 @@ namespace audio_dataset_screener
             {
                 if(item.SubItems[1].Text != string.Empty)
                 {
-                    if (MessageBox.Show("还有未应用的筛选动作，确实要退出程序吗？", "筛选动作未应用", MessageBoxButtons.OKCancel) != DialogResult.OK)
+                    if (MessageBox.Show("还有未执行的筛选动作，确实要退出程序吗", "提示", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) != DialogResult.OK)
                     {
                         e.Cancel = true;//取消关闭动作
                         return;
@@ -894,7 +926,8 @@ namespace audio_dataset_screener
 
         private void labelAbout_Click(object sender, EventArgs e)
         {
-            System.Diagnostics.Process.Start("https://github.com/2DIPW/audio_dataset_screener");
+            frmAbout frmAbout = new frmAbout();
+            frmAbout.ShowDialog();
         }
 
 

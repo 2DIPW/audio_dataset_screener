@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace audio_dataset_screener
 {
-    internal class ProjectData
+    internal class ProjectData //工程文件的json结构
     {
         public Dictionary<int,string> Labels { get; set; }
         public List<ProjectFileData> Files { get; set; }
