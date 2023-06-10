@@ -203,7 +203,7 @@ namespace audio_dataset_screener
             }
             catch
             {
-                MessageBox.Show("载入工程文件出错", "错误", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("工程文件格式不正确", "错误", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return (0, 0);
             }
 
@@ -215,13 +215,7 @@ namespace audio_dataset_screener
 
             clear_filelist();
 
-            List<string> existed_paths_in_filelist = new List<string>();
-            foreach (ListViewItem item in lvFileList.Items)
-            {
-                existed_paths_in_filelist.Add(item.SubItems[4].Text);
-            }//获取当前列表中的所有文件路径
-
-            if(projectData.Labels != null)
+            if(projectData.Labels != null)//读取工程文件中的分类目录设置
             {
                 if (projectData.Labels.Count > 5)
                 {
@@ -236,7 +230,7 @@ namespace audio_dataset_screener
                     }
                 }
             }
-            if(projectData.Files != null)
+            if(projectData.Files != null)//读取工程文件中的文件列表
             {
                 int total_amount = projectData.Files.Count;
                 int succeed_amount = 0;
@@ -249,18 +243,32 @@ namespace audio_dataset_screener
                 lvFileList.BeginUpdate();
                 this.Enabled = false;
 
-
-
                 foreach (ProjectFileData file in projectData.Files)
                 {
                     try
                     {
                         SoundInfo soundinfo = new SoundInfo(file.Filepath);
-                        if (soundinfo.Duration != string.Empty & !existed_paths_in_filelist.Contains(soundinfo.FilePath))//如果无法读取时长，则认为不是受支持的音频文件，或如果列表中已存在相同路径的文件，都不予添加
+                        if (soundinfo.Duration != string.Empty)//如果无法读取时长，则认为不是受支持的音频文件，不予添加
                         {
                             ListViewItem lvItem = new ListViewItem();
                             lvItem.SubItems[0].Text = string.Empty;
-                            lvItem.SubItems.Add((file.Label == 0 | file.Label > 5) ? string.Empty : file.Label.ToString());
+                            string label;//将工程文件中的label转换为文件列表中的动作标记
+                            if(file.Label == 0 | file.Label > 5 | file.Label < -1)//排除不需要动作标记的情况
+                            {
+                                label = string.Empty;
+                            }
+                            else
+                            {
+                                if(file.Label == -1)
+                                {
+                                    label = "删";
+                                }
+                                else
+                                {
+                                    label = file.Label.ToString();
+                                }
+                            }
+                            lvItem.SubItems.Add(label);
                             lvItem.SubItems.Add(soundinfo.FileName);
                             lvItem.SubItems.Add(soundinfo.Duration);
                             lvItem.SubItems.Add(soundinfo.FilePath);
@@ -295,15 +303,28 @@ namespace audio_dataset_screener
             ProjectData projectData = new ProjectData();
             projectData.Labels = new Dictionary<int, string>();
             projectData.Files = new List<ProjectFileData>();
-            for (int i = 1; i <= 5; i++)
+            for (int i = 1; i <= 5; i++)//将分类目录设置转换为工程文件中的Labels
             {
                 projectData.Labels.Add(i, folder_paths[i - 1].Text);
             }
-            foreach (ListViewItem item in lvFileList.Items)
+            foreach (ListViewItem item in lvFileList.Items)//将文件列表保存为工程文件中的Files
             {
                 ProjectFileData projectFileData = new ProjectFileData();
                 projectFileData.Filepath = item.SubItems[4].Text;
-                projectFileData.Label = item.SubItems[1].Text == string.Empty ? 0 : int.Parse(item.SubItems[1].Text);
+                int label;
+                switch (item.SubItems[1].Text)//将动作标记转换为Labels
+                {
+                    case "":
+                        label = 0;
+                        break;
+                    case "删":
+                        label = -1;
+                        break;
+                    default:
+                        label = int.Parse(item.SubItems[1].Text);
+                        break;
+                }
+                projectFileData.Label = label;
                 projectFileData.Similarity = item.SubItems[5].Text == string.Empty ? 0 : float.Parse(item.SubItems[5].Text);
                 projectData.Files.Add(projectFileData);
             }
@@ -323,15 +344,15 @@ namespace audio_dataset_screener
         {
             System.Windows.Forms.TextBox[] folder_paths = { txtboxSortFolder1, txtboxSortFolder2, txtboxSortFolder3, txtboxSortFolder4, txtboxSortFolder5 };
 
-            lvFileList.BeginUpdate();
-
             int total_amount = items.Count;
             int succeed_amount = 0;
 
             processBar.Maximum = total_amount;
             processBar.Value = 0;
             processBar.Visible = true;
-            
+
+            lvFileList.BeginUpdate();
+            this.Enabled = false;
 
             foreach (ListViewItem item in items)
             {
@@ -367,6 +388,7 @@ namespace audio_dataset_screener
                 
             }
             processBar.Visible = false;
+            this.Enabled = true;
             lvFileList.EndUpdate();
             return (total_amount, succeed_amount);
         }
