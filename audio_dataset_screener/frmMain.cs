@@ -226,7 +226,11 @@ namespace audio_dataset_screener
                     System.Windows.Forms.TextBox[] folder_paths = { txtboxSortFolder1, txtboxSortFolder2, txtboxSortFolder3, txtboxSortFolder4, txtboxSortFolder5 };
                     for (int i = 1; i <= 5; i++)
                     {
-                        folder_paths[i - 1].Text = projectData.Labels[i];
+                        try
+                        {
+                            folder_paths[i - 1].Text = projectData.Labels[i];
+                        }
+                        catch { }
                     }
                 }
             }
