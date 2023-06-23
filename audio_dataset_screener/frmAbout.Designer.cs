@@ -45,7 +45,7 @@
             this.labelAbout.Name = "labelAbout";
             this.labelAbout.Size = new System.Drawing.Size(315, 80);
             this.labelAbout.TabIndex = 1;
-            this.labelAbout.Text = "Audio Dataset Screener\r\nVersion 1.3.0\r\nDeveloped by 2DIPW\r\nLicensed under GNU Gen" +
+            this.labelAbout.Text = "Audio Dataset Screener\r\nVersion 1.3.1\r\nDeveloped by 2DIPW\r\nLicensed under GNU Gen" +
     "eral Public License v3\r\nOpen source leads the world to a brighter future!";
             // 
             // linkLabelGithub

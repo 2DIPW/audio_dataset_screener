@@ -826,7 +826,7 @@
             this.labelAbout.Name = "labelAbout";
             this.labelAbout.Size = new System.Drawing.Size(240, 17);
             this.labelAbout.TabIndex = 4;
-            this.labelAbout.Text = "Audio Dataset Screener 1.3.0 by 2DIPW";
+            this.labelAbout.Text = "Audio Dataset Screener 1.3.1 by 2DIPW";
             this.labelAbout.Click += new System.EventHandler(this.labelAbout_Click);
             // 
             // labelShortcut2
